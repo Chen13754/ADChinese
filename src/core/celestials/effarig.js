@@ -38,12 +38,12 @@ export const Effarig = {
   get currentStageName() {
     switch (this.currentStage) {
       case EFFARIG_STAGES.INFINITY:
-        return "Infinity";
+        return "无限";
       case EFFARIG_STAGES.ETERNITY:
-        return "Eternity";
+        return "永恒";
       case EFFARIG_STAGES.REALITY:
       default:
-        return "Reality";
+        return "现实";
     }
   },
   get eternityCap() {

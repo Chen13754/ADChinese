@@ -57,7 +57,7 @@ export default {
     },
     spectateText() {
       return this.isSpectating
-        ? "Numbers here are unaffected by END so that you can see your final records."
+        ? "这里的数字不受 END 记数法影响，以便查看最终记录。"
         : null;
     }
   },

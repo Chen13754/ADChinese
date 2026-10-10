@@ -89,15 +89,15 @@ export const GameStorage = {
   },
 
   get localStorageKey() {
-    return DEV ? "dimensionTestSave" : "dimensionSave";
+    return DEV ? "yc-ad:dimensionTestSave" : "yc-ad:dimensionSave";
   },
 
   backupDataKey(saveSlot, backupSlot) {
-    return DEV ? `backupTestSave-${saveSlot}-${backupSlot}` : `backupSave-${saveSlot}-${backupSlot}`;
+    return DEV ? `yc-ad:backupTestSave-${saveSlot}-${backupSlot}` : `yc-ad:backupSave-${saveSlot}-${backupSlot}`;
   },
 
   backupTimeKey(saveSlot) {
-    return DEV ? `backupTestTimes-${saveSlot}` : `backupTimes-${saveSlot}`;
+    return DEV ? `yc-ad:backupTestTimes-${saveSlot}` : `yc-ad:backupTimes-${saveSlot}`;
   },
 
   load() {
@@ -151,40 +151,99 @@ export const GameStorage = {
     Achievements.updateSteamStatus();
   },
 
-  import(saveData) {
-    if (tryImportSecret(saveData) || Theme.tryUnlock(saveData)) {
-      return;
-    }
-    const newPlayer = GameSaveSerializer.deserialize(saveData);
-    if (this.checkPlayerObject(newPlayer) !== "") {
-      Modal.message.show("无法加载存档（格式无法识别或无效）。");
-      return;
-    }
-    this.oldBackupTimer = player.backupTimer;
-    Modal.hideAll();
-    Quote.clearAll();
-    AutomatorBackend.clearEditor();
-    this.loadPlayerObject(newPlayer);
-    GlyphAppearanceHandler.clearInvalidCosmetics();
-    if (player.speedrun?.isActive) Speedrun.setSegmented(true);
-    this.save(true);
-    Cloud.resetTempState();
-    this.resetBackupTimer();
-
-    // This is to fix a very specific exploit: When the game is ending, some tabs get hidden
-    // The options tab is the first one of those, which makes the player redirect to the Pelle tab
-    // You can doom your reality even if you haven't unlocked infinity yet if you import while the Pelle tab
-    // is showing
-    Tab.options.subtabs[0].show();
-    GameUI.notify.info("已导入存档");
-    Achievements.updateSteamStatus();
+  checkImport(saveData) {
+    try {
+      const value = GameSaveSerializer.deserialize(String(saveData).trim());
+      if (!value || typeof value !== "object" || Array.isArray(value)) return "存档格式无法识别";
+      if (this.checkPlayerObject(value)) return this.checkPlayerObject(value);
+      const latestVersion = Math.max(Player.defaultStart.version, ...Object.keys(migrations.patches).map(Number));
+      if (typeof value.version !== "undefined" && (!Number.isFinite(value.version) || value.version > latestVersion)) {
+        return "该存档来自不支持的游戏版本，请使用与本网页兼容的存档";
+      }
+      const amount = new Decimal(value.antimatter ?? value.money);
+      if (!Number.isFinite(amount.exponent) || !Number.isFinite(amount.mantissa) || amount.lt(0)) return "反物质数值无效";
+      // Do not run migrations in preview: legacy patches can schedule UI work.
+      for (const key of ["options", "records", "reality", "celestials", "dimensions"]) {
+        if (value[key] !== undefined && (!value[key] || typeof value[key] !== "object" || Array.isArray(value[key]))) {
+          return `存档的 ${key} 数据损坏`;
+        }
+      }
+      if (value.lastUpdate !== undefined && (!Number.isFinite(value.lastUpdate) || value.lastUpdate < 0)) return "存档时间无效";
+      for (const key of ["antimatter", "infinity", "time"]) {
+        const rows = value.dimensions?.[key];
+        if (rows !== undefined && (!Array.isArray(rows) || rows.length !== 8 || rows.some(r => !r || typeof r !== "object"))) return "维度数据损坏";
+      }
+      return "";
+    } catch { return "存档损坏，或无法完成版本迁移"; }
   },
 
-  importAsFile() {
-    if (GameEnd.creditsEverClosed) return;
-    const reader = new FileReader();
-    const text = reader.readAsText(file);
-    this.import(text);
+  import(saveData) {
+    if (tryImportSecret(saveData) || Theme.tryUnlock(saveData)) return false;
+    const error = this.checkImport(saveData);
+    if (error || !this.canSave()) {
+      Modal.message.show(error || "请等待当前选择或离线计算结束后再导入");
+      return false;
+    }
+    const previous = {
+      player: deepmergeAll([{}, player]), saves: { ...this.saves }, slot: this.currentSlot,
+      rates: { ...YC.rates }, offlineEnabled: this.offlineEnabled, offlineTicks: this.offlineTicks,
+      oldBackupTimer: this.oldBackupTimer, lastBackupTimes: deepmergeAll([{}, this.lastBackupTimes]),
+      local: Object.fromEntries(Object.keys(localStorage).filter(k => k.startsWith("yc-ad:")).map(k => [k, localStorage.getItem(k)])),
+    };
+    const restore = cause => {
+      GameIntervals.stop();
+      ui.view.modal.progressBar = undefined;
+      Async.enabled = true;
+      GameUI.notify.showBlackHoles = true;
+      this.currentSlot = previous.slot;
+      this.saves = previous.saves;
+      this.offlineEnabled = false;
+      try { this.loadPlayerObject(previous.player); }
+      catch { player = previous.player; this.saves[this.currentSlot] = player; Lazy.invalidateAll(); GameUI.update(); }
+      this.offlineEnabled = previous.offlineEnabled;
+      this.offlineTicks = previous.offlineTicks;
+      this.oldBackupTimer = previous.oldBackupTimer;
+      this.lastBackupTimes = previous.lastBackupTimes;
+      YC.rates = previous.rates;
+      let storageRestored = true;
+      try {
+        for (const key of Object.keys(localStorage).filter(k => k.startsWith("yc-ad:"))) {
+          if (!(key in previous.local)) localStorage.removeItem(key);
+        }
+        for (const [key, value] of Object.entries(previous.local)) localStorage.setItem(key, value);
+      } catch { storageRestored = false; }
+      Modal.message.show(storageRestored
+        ? "导入失败，已恢复原来的进度。"
+        : "导入失败，当前进度已在内存中恢复，但浏览器存储写入失败。请先导出存档，再关闭网页。");
+      console.error("Save import failed", cause);
+      return false;
+    };
+    const finish = () => {
+      GlyphAppearanceHandler.clearInvalidCosmetics();
+      if (player.speedrun?.isActive) Speedrun.setSegmented(true);
+      this.save(true);
+      Cloud.resetTempState();
+      this.resetBackupTimer();
+      Tab.options.subtabs[0].show();
+      GameUI.notify.info("已导入存档，加速已恢复正常");
+      Achievements.updateSteamStatus();
+      return true;
+    };
+    try {
+      const newPlayer = GameSaveSerializer.deserialize(String(saveData).trim());
+      this.oldBackupTimer = player.backupTimer;
+      Modal.hideAll(); Quote.clearAll(); AutomatorBackend.clearEditor();
+      const loading = this.loadPlayerObject(newPlayer);
+      return loading?.then ? loading.then(finish).catch(restore) : finish();
+    } catch (cause) { return restore(cause); }
+  },
+
+  async importAsFile(file) {
+    if (!file || GameEnd.creditsEverClosed) return;
+    try {
+      const text = await file.text();
+      Modal.import.show({ initialInput: text.trim() });
+    } catch { Modal.message.show("无法读取存档文件，请重新选择，或使用存档文本。"); }
   },
 
   overwriteSlot(slot, saveData) {
@@ -355,13 +414,13 @@ export const GameStorage = {
     const y = dateObj.getFullYear();
     const m = dateObj.getMonth() + 1;
     const d = dateObj.getDate();
-    return `${y}-${m}-${d}`;
+    return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}_${String(dateObj.getHours()).padStart(2, "0")}-${String(dateObj.getMinutes()).padStart(2, "0")}-${String(dateObj.getSeconds()).padStart(2, "0")}`;
   },
 
   exportAsFile() {
     if (!this.canSave()) return;
     player.options.exportedFileCount++;
-    this.save(true);
+    try { this.save(true); } catch { GameUI.notify.error("浏览器本地存储写入失败，仍将导出内存中的当前进度"); }
     const saveFileName = player.options.saveFileName ? ` - ${player.options.saveFileName},` : "";
     const save = this.exportModifiedSave();
     download(
@@ -386,13 +445,19 @@ export const GameStorage = {
 
   importBackupsFromFile(importText) {
     const backupData = GameSaveSerializer.deserialize(importText);
+    const validIDs = AutoBackupSlots.map(s => String(s.id));
+    if (!backupData || !backupData.time || Object.keys(backupData).some(k => k !== "time" &&
+        (!validIDs.includes(k) || !backupData.time[k] || this.checkImport(GameSaveSerializer.serialize(backupData[k]))))) {
+      GameUI.notify.error("备份文件无效，现有存档和备份保持不变");
+      return false;
+    }
     localStorage.setItem(this.backupTimeKey(this.currentSlot), GameSaveSerializer.serialize(backupData.time));
     for (const backupKey of Object.keys(backupData)) {
       if (backupKey === "time") continue;
       const id = Number(backupKey);
       const storageKey = this.backupDataKey(this.currentSlot, id);
       localStorage.setItem(storageKey, GameSaveSerializer.serialize(backupData[backupKey]));
-      this.backupTimeData[id] = {
+      this.lastBackupTimes[id] = {
         backupTimer: backupData.time[id].backupTimer,
         date: backupData.time[id].date,
       };
@@ -421,6 +486,7 @@ export const GameStorage = {
   },
 
   loadPlayerObject(playerObject) {
+    YC.reset();
     this.saved = 0;
 
     const checkString = this.checkPlayerObject(playerObject);
@@ -490,6 +556,7 @@ export const GameStorage = {
     AutomatorBackend.initializeFromSave();
     Lazy.invalidateAll();
 
+    let loading;
     const rawDiff = Date.now() - player.lastUpdate;
     // We set offlineEnabled externally on importing or loading a backup; otherwise this is just a local load
     const simulateOffline = this.offlineEnabled ?? player.options.offlineProgress;
@@ -503,7 +570,7 @@ export const GameStorage = {
         // The third parameter is a `fast` parameter that we use to only
         // simulate at most 50 ticks if the player was offline for less
         // than 50 seconds.
-        simulateTime(diff / 1000, false, diff < 50 * 1000);
+        loading = simulateTime(diff / 1000, false, diff < 50 * 1000);
       } else {
         // This is ugly, should fix how we deal with it...
         this.postLoadStuff();
@@ -530,6 +597,7 @@ export const GameStorage = {
       }, 2500);
       setTimeout(() => Modal.catchup.show(rawDiff), 5000);
     }
+    return loading;
   },
   postLoadStuff() {
     // This is called from simulateTime, if that's called; otherwise, it gets called

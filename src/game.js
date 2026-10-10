@@ -307,7 +307,7 @@ export const GAME_SPEED_EFFECT = {
   * @param {number?} blackHolesActiveOverride A numerical value which forces all black holes up to its specified index
   *   to be active for the purposes of game speed calculation. This is only used during offline black hole stuff.
   */
-export function getGameSpeedupFactor(effectsToConsider, blackHolesActiveOverride) {
+export function getGameSpeedupFactor(effectsToConsider, blackHolesActiveOverride, forDisplay = false) {
   let effects;
   if (effectsToConsider === undefined) {
     effects = [GAME_SPEED_EFFECT.FIXED_SPEED, GAME_SPEED_EFFECT.TIME_GLYPH, GAME_SPEED_EFFECT.BLACK_HOLE,
@@ -348,6 +348,8 @@ export function getGameSpeedupFactor(effectsToConsider, blackHolesActiveOverride
     factor = Math.pow(factor, getAdjustedGlyphEffect("effarigblackhole"));
   }
 
+  factor *= forDisplay ? YC.selectedRate("gameTime") : YC.rate("gameTime");
+
   if (Enslaved.isStoringGameTime && effects.includes(GAME_SPEED_EFFECT.TIME_STORAGE)) {
     const storedTimeWeight = Ra.unlocks.autoPulseTime.canBeApplied ? 0.99 : 1;
     factor = factor * (1 - storedTimeWeight) + storedTimeWeight;
@@ -375,7 +377,7 @@ export function getGameSpeedupFactor(effectsToConsider, blackHolesActiveOverride
 }
 
 export function getGameSpeedupForDisplay() {
-  const speedFactor = getGameSpeedupFactor();
+  const speedFactor = getGameSpeedupFactor(undefined, undefined, true);
   if (
     Enslaved.isAutoReleasing &&
     Enslaved.canRelease(true) &&
@@ -392,12 +394,12 @@ export function getGameSpeedupForDisplay() {
 export function realTimeMechanics(realDiff) {
   // Ra memory generation bypasses stored real time, but memory chunk generation is disabled when storing real time.
   // This is in order to prevent players from using time inside of Ra's reality for amplification as well
-  Ra.memoryTick(realDiff, !Enslaved.isStoringRealTime);
+  Ra.memoryTick(YC.time("raMemory", realDiff), !Enslaved.isStoringRealTime);
   if (AlchemyResource.momentum.isUnlocked) {
-    player.celestials.ra.momentumTime += realDiff * Achievement(175).effectOrDefault(1);
+    player.celestials.ra.momentumTime += YC.time("momentum", realDiff) * Achievement(175).effectOrDefault(1);
   }
 
-  DarkMatterDimensions.tick(realDiff);
+  DarkMatterDimensions.tick(YC.time("darkMatter", realDiff));
 
   // When storing real time, skip everything else having to do with production once stats are updated
   if (Enslaved.isStoringRealTime) {
@@ -420,6 +422,13 @@ export function realTimeMechanics(realDiff) {
 // equal to the update rate, but may be much larger if the game was unfocused or the device went to sleep for some time.
 // eslint-disable-next-line complexity
 export function gameLoop(passDiff, options = {}) {
+  const wasOnline = YC.online;
+  YC.online = passDiff === undefined;
+  try { return runGameLoop(passDiff, options); }
+  finally { YC.online = wasOnline; }
+}
+
+function runGameLoop(passDiff, options = {}) {
   PerformanceStats.start("Frame Time");
   PerformanceStats.start("Game Update");
 
@@ -448,6 +457,7 @@ export function gameLoop(passDiff, options = {}) {
   // simply letting it run through simulateTime seems to result in it using zero
   if (player.options.hibernationCatchup && passDiff === undefined && realDiff > 6e4) {
     GameIntervals.gameLoop.stop();
+    YC.online = false;
     simulateTime(realDiff / 1000, true);
     realTimeMechanics(realDiff);
     return;
@@ -550,14 +560,14 @@ export function gameLoop(passDiff, options = {}) {
   }
 
 
-  applyAutoprestige(realDiff);
-  updateImaginaryMachines(realDiff);
+  applyAutoprestige(YC.time("passivePrestige", realDiff));
+  updateImaginaryMachines(YC.time("imaginaryMachines", realDiff));
 
-  const uncountabilityGain = AlchemyResource.uncountability.effectValue * Time.unscaledDeltaTime.totalSeconds;
+  const uncountabilityGain = AlchemyResource.uncountability.effectValue * YC.time("uncountability", Time.unscaledDeltaTime.totalSeconds);
   Currency.realities.add(uncountabilityGain);
   Currency.perkPoints.add(uncountabilityGain);
 
-  if (Perk.autocompleteEC1.canBeApplied) player.reality.lastAutoEC += realDiff;
+  if (Perk.autocompleteEC1.canBeApplied) player.reality.lastAutoEC += YC.time("autoEC", realDiff);
 
   EternityChallenge(12).tryFail();
   Achievements._power.invalidate();
@@ -584,7 +594,7 @@ export function gameLoop(passDiff, options = {}) {
   Currency.timeTheorems.add(getTTPerSecond().times(diff / 1000));
   InfinityDimensions.tryAutoUnlock();
 
-  BlackHoles.updatePhases(blackHoleDiff);
+  BlackHoles.updatePhases(YC.time("blackHole", blackHoleDiff));
 
   // Unlocks dilation at a certain total TT count for free, but we add the cost first in order to make
   // sure that TT count doesn't go negative and that we can actually buy it. This technically bumps the max theorem
@@ -607,19 +617,19 @@ export function gameLoop(passDiff, options = {}) {
   if ((teresa1 || teresa25) && !Pelle.isDoomed) rewardTP();
 
   if (Enslaved.canTickHintTimer) {
-    player.celestials.enslaved.hintUnlockProgress += Enslaved.isRunning ? realDiff : (realDiff * 0.4);
+    player.celestials.enslaved.hintUnlockProgress += YC.time("enslavedHints", realDiff) * (Enslaved.isRunning ? 1 : 0.4);
     if (player.celestials.enslaved.hintUnlockProgress >= TimeSpan.fromHours(5).totalMilliseconds) {
       EnslavedProgress.hintsUnlocked.giveProgress();
       Enslaved.quotes.hintUnlock.show();
     }
   }
 
-  laitelaRealityTick(realDiff);
+  laitelaRealityTick(YC.time("laitelaEntropy", realDiff));
   Achievements.autoAchieveUpdate(diff);
   V.checkForUnlocks();
-  AutomatorBackend.update(realDiff);
-  Pelle.gameLoop(realDiff);
-  GalaxyGenerator.loop(realDiff);
+  AutomatorBackend.update(YC.time("automator", realDiff));
+  Pelle.gameLoop(YC.time("pelle", realDiff));
+  GalaxyGenerator.loop(YC.time("galaxyGenerator", realDiff));
   GameEnd.gameLoop(realDiff);
 
   if (!Enslaved.canAmplify) {
@@ -730,7 +740,7 @@ function laitelaRealityTick(realDiff) {
 
   // Setting entropy to -1 on completion prevents the modal from showing up repeatedly
   if (laitelaInfo.entropy >= 1) {
-    let completionText = `Lai'tela's Reality has been destabilized after ${Time.thisRealityRealTime.toStringShort()}.`;
+    let completionText = `莱特拉的现实已在 ${Time.thisRealityRealTime.toStringShort()} 后达到不稳定。`;
     laitelaInfo.entropy = -1;
     const oldInfo = {
       fastestCompletion: laitelaInfo.fastestCompletion,
@@ -779,17 +789,10 @@ function laitelaRealityTick(realDiff) {
 function laitelaBeatText(disabledDim) {
   switch (disabledDim) {
     case 1: return `<br><br>在莱特拉的现实中，所有种类的所有维度都不产生任何东西。你仍然可以进入祂的现实，但你无法继续让祂的现实出现不稳定。祂的现实已完全不稳定，暗能量的产量额外 ${formatX(8)}`;
-    case 2: return `<br><br>Lai'tela's Reality will now disable production from all 2nd Dimensions during
-      future runs, but the reward will be ${formatInt(100)} times stronger than before. Completely destabilizing
-      the Reality for the final Dimension will give you an additional ${formatX(8)} to Dark Energy gain.`;
-    case 3: return `<br><br>Lai'tela's Reality will now disable production from all 3rd Dimensions during
-        future runs, but the reward will be ${formatInt(100)} times stronger than before.`;
-    case 8: return `<br><br>Lai'tela's Reality will now disable production from all 8th Dimensions during
-        future runs, but the reward will be ${formatInt(100)} times stronger than before. This boost can be
-        repeated for each remaining Dimension by reaching destabilization within ${formatInt(30)} seconds again.`;
-    default: return `<br><br>Lai'tela's Reality will now disable production from all
-        ${disabledDim}th Dimensions during future runs, but the reward will be
-        ${formatInt(100)} times stronger than before.`;
+    case 2: return `<br><br>今后进入莱特拉的现实时，所有第二维度均停止生产，但奖励增强 ${formatInt(100)} 倍。最后一个维度完全不稳定后，暗能量产量额外 ${formatX(8)}。`;
+    case 3: return `<br><br>今后进入莱特拉的现实时，所有第三维度均停止生产，但奖励增强 ${formatInt(100)} 倍。`;
+    case 8: return `<br><br>今后进入莱特拉的现实时，所有第八维度均停止生产，但奖励增强 ${formatInt(100)} 倍。再次在 ${formatInt(30)} 秒内达到不稳定，可依次对剩余维度重复此强化。`;
+    default: return `<br><br>今后进入莱特拉的现实时，所有第 ${disabledDim} 维度均停止生产，但奖励增强 ${formatInt(100)} 倍。`;
   }
 }
 
@@ -972,7 +975,7 @@ export function simulateTime(seconds, real, fast) {
   } else {
     const progress = {};
     ui.view.modal.progressBar = {};
-    Async.run(loopFn,
+    return Async.run(loopFn,
       ticks,
       {
         batchSize: 1,

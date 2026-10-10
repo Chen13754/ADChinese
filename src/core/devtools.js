@@ -72,7 +72,7 @@ dev.fixSave = function() {
   const fixed = save.replace(/NaN/gui, "10");
   const saveData = JSON.parse(fixed);
   if (!saveData || GameStorage.checkPlayerObject(saveData) !== "") {
-    Modal.message.show("Could not fix the save.");
+    Modal.message.show("无法修复存档。");
     return;
   }
   GameStorage.loadPlayerObject(saveData);

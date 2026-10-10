@@ -25,29 +25,29 @@ export default {
     @confirm="handleYesClick"
   >
     <template #header>
-      You are about to respec your Shop Purchases
+      即将重置商店购买记录
     </template>
     <div
       class="c-modal-message__text"
       data-v-respec-iap-modal
     >
-      Are you sure you want to respec your Shop Purchases? This will not cost anything and
-      return the {{ returnedSTDCount() }}
+      确定要重置商店购买记录吗？此操作不会花费任何东西。
+      将返还你在所有永久倍率升级上花费的 {{ returnedSTDCount() }}
       <img
         src="./public/images/std_coin.png"
         class="o-shop-button-button__img"
         data-v-respec-iap-modal
-      > you spent on all purchases which give permanent multipliers.
+      > 个 STD 币。
       <br>
       <br>
-      Anything spent on offline progress and Glyph cosmetics will not be refunded. Glyph cosmetic sets are
-      permanent and will not be lost or respeced once purchased.
+      离线进度和符文外观的花费不会退还。已购买的符文外观套装
+      永久有效，重置商店购买记录后也不会丢失。
       <br>
       <br>
       <b
         class="o-warning"
         data-v-respec-iap-modal
-       >You will not be able to respec again unless you purchase more STD coins.</b>
+       >除非再次购买 STD 币，否则你无法再次重置商店购买记录。</b>
     </div>
   </ModalWrapperChoice>
   `

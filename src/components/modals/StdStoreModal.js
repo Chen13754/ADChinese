@@ -27,8 +27,8 @@ export default {
       投币支持开发者
     </template>
     <span v-if="macPurchaser">
-      <button class="o-shop-button-button" @click="macConfirm()">Confirm Purchase to Receive STDs</button>
-      <br><span>(Required on Mac)</span><br>
+      <button class="o-shop-button-button" @click="macConfirm()">确认购买以领取 STD 币</button>
+      <br><span>（Mac 版需完成此操作）</span><br>
     </span>
     <div class="l-modal-store-content">
       <img src="./public/images/std_coin.png">

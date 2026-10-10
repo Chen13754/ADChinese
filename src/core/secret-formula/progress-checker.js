@@ -137,9 +137,9 @@ export const progressStages = [
   },
   {
     id: PROGRESS_STAGE.IMAGINARY_MACHINES,
-    name: "虚幻机器",
+    name: "虚数机器",
     hasReached: save => save.reality?.iMCap > 0,
-    suggestedResource: "虚幻机器",
+    suggestedResource: "虚数机器",
     subProgressValue: save => Math.log10(1 + save.reality.iMCap) / 9,
   },
   {

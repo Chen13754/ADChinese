@@ -58,7 +58,7 @@ export default {
       @click="showModal(template)"
       data-v-automator-docs-template-list
     >
-      模板：{{ template.name }}
+      模板：{{ template.displayName }}
     </button>
     由于你当前处于{{ isBlock ? "积木块" : "文本" }}编辑器，此面板将{{ pasteText }}
     <br>

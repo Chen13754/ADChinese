@@ -113,7 +113,7 @@ ${PlayerProgress.dilationUnlocked() ? "- <b>TG</b>：超光速粒子星系<br>" 
 ${PlayerProgress.realityUnlocked() ? "- <b>RM</b>：现实机器<br>" : ""}
 ${PlayerProgress.realityUnlocked() ? "- <b>AP</b>：自动机点数<br>" : ""}
 ${PlayerProgress.realityUnlocked() ? "- <b>BH</b>：黑洞<br>" : ""}
-${MachineHandler.isIMUnlocked ? "- <b>iM</b>：虚幻机器<br>" : ""}
+${MachineHandler.isIMUnlocked ? "- <b>iM</b>：虚数机器<br>" : ""}
 ${Laitela.isUnlocked ? "- <b>DM</b>：暗物质<br>" : ""}
 ${Laitela.isUnlocked ? "- <b>DE</b>：暗能量<br>" : ""}
 `,
@@ -539,7 +539,7 @@ ${Laitela.isUnlocked ? "- <b>DE</b>：暗能量<br>" : ""}
     }, {
       name: "现实",
       info: () => `
-      当你达到 ${formatPostBreak(DC.E4000)} 永恒点数并完成前 ${formatInt(13)} 行成就时，你将能够购买解锁“现实”的时间研究。解锁后会开启新标签页，在那里你可以找到开始新现实的按钮。开始新现实将重置目前为止几乎所有游戏进度，但作为回报，你将获得新货币“现实机器”、一个符文和一个复兴点数。
+      当你达到 ${formatPostBreak(DC.E4000)} 永恒点数并完成前 ${formatInt(13)} 行成就时，你将能够购买解锁“现实”的时间研究。解锁后会开启新标签页，在那里你可以找到开始新现实的按钮。开始新现实将重置目前为止几乎所有游戏进度，但作为回报，你将获得新货币“现实机器”、一个符文和一个特权点。
 
 <br><br>
 与其他重置不同，这次你还会失去前 ${formatInt(13)} 行成就——即所有现实前的成就及其相关奖励。不过，你仍会保留统计标签页“概况”分类下的所有数据，以及所有最佳挑战时间。
@@ -551,7 +551,7 @@ ${Laitela.isUnlocked ? "- <b>DE</b>：暗能量<br>" : ""}
 你需要重新满足每个成就的要求才能再次获得奖励，但每 ${timeDisplayNoDecimals(30 * 60000)} 你也会被动解锁下一个未完成的成就，即使你并未满足要求。这个自动完成功能可以关闭，此时计时器会倒数至零并暂停，在取消暂停时立即完成另一个成就。离线时计时器仍会以相同速度推进。
 
 <br><br>
-现实机器可以花费于现实标签页的不同升级上，从此成为你的主要货币。符文是可装备的物品，必须装备才能获得加成。复兴点数是另一种货币，可在复兴子标签页用于购买不同复兴节点。
+现实机器可以花费于现实标签页的不同升级上，从此成为你的主要货币。符文是可装备的物品，必须装备才能获得加成。特权点是另一种货币，可在复兴子标签页用于购买不同特权节点。
 
 <br><br>
 现实机器的数量完全取决于永恒点数，现实按钮会告诉你需要多少永恒点数才能获得下一个现实机器。前 ${formatInt(10)} 个现实机器在 ${formatPostBreak(DC.E4000)} 到 ${formatPostBreak(DC.C10P16000D3)} 永恒点数之间呈指数线性增长，超过后计算公式为：现实机器 = ${formatInt(1000)}<sup>log<sub>${formatInt(10)}</sub>(永恒点数)/${formatInt(4000)}-${formatInt(1)}</sup>。这个公式在超过 ${formatPostBreak(DC.C10P16000D3)} 永恒点数后比线性增长获得更多现实机器。
@@ -560,7 +560,7 @@ ${Laitela.isUnlocked ? "- <b>DE</b>：暗能量<br>" : ""}
 符文等级取决于永恒点数、复制器和膨胀时间的组合，最低为 ${formatInt(1)} 级。符文的类型、效果和稀有度是随机的。
 
 <br><br>
-每次现实获得 ${formatInt(1)} 个复兴点数。
+每次现实获得 ${formatInt(1)} 个特权点。
 
 <br><br>
 <b>快捷键：Y</b> 可尝试进行现实重置。
@@ -608,15 +608,15 @@ Shift+点击符文可删除（需确认），Ctrl+Shift+点击可跳过确认。
       tags: ["reality", "sacrifice", "level", "endgame", "lategame"],
       tab: "reality/glyphs"
     }, {
-      name: "复兴树",
+      name: "特权树",
       info: () => `
-复兴是现实解锁后的一种升级类型。每个复兴效果各不相同，但大多数都是你可以自行选择路径的游戏体验(QoL)改进。所有复兴都只需要花费 ${formatInt(1)} 个复兴点数即可购买。
+复兴是现实解锁后的一种升级类型。每个复兴效果各不相同，但大多数都是你可以自行选择路径的游戏体验优化。所有复兴都只需要花费 ${formatInt(1)} 个特权点即可购买。
 
 <br><br>
-每次现实重置后，你将获得 ${formatInt(1)} 个复兴点数，可用于在复兴树上购买升级，初始选项为“现实时你可以在 ${formatInt(4)} 个不同的符文中选择一个符文”。你只能解锁与你已拥有复兴直接相邻的节点，不过树状图中存在可以双向通过的循环路径。
+每次现实重置后，你将获得 ${formatInt(1)} 个特权点，可用于在特权树上购买升级，初始选项为“现实时你可以在 ${formatInt(4)} 个不同的符文中选择一个符文”。你只能解锁与你已拥有复兴直接相邻的节点，不过树状图中存在可以双向通过的循环路径。
 
 <br><br>
-复兴节点有两种不同形状——圆形和菱形。两者唯一的区别在于菱形节点除了常规效果外还会提供自动点数。不同节点还具有不同颜色，大致表示它们最影响游戏的哪个部分。
+特权节点有两种不同形状——圆形和菱形。两者唯一的区别在于菱形节点除了常规效果外还会提供自动点数。不同节点还具有不同颜色，大致表示它们最影响游戏的哪个部分。
 `,
       isUnlocked: () => PlayerProgress.realityUnlocked() || TimeStudy.reality.isBought,
       tags: ["pp", "reality", "tree", "endgame", "lategame"],
@@ -694,7 +694,7 @@ Shift+点击符文可删除（需确认），Ctrl+Shift+点击可跳过确认。
 <br>  
 黑洞加速效果远强于计数频率，因为它能<i>完全均等地影响一切</i>：包括仅部分受计数频率影响的内容（如无限/时间维度）、通常完全不受影响的内容（如膨胀时间/时间之理生成）、以及纯时间累积的增益（如挂机路径的无限点数/永恒点数倍率）。  
 <br>  
-虽然游戏多数功能受此加速影响，但部分机制保持原速。此类情况会特别注明使用<i>现实时间</i>而非<i>游戏时间</i>。例如随时间自动完成永恒挑战的复兴节点。此后若无特别说明，所有时间均指<i>游戏时间</i>。需注意：当涉及需<i>减少</i>耗时的机制（如现实升级“快速复现”）时同样适用此规则。  
+虽然游戏多数功能受此加速影响，但部分机制保持原速。此类情况会特别注明使用<i>现实时间</i>而非<i>游戏时间</i>。例如随时间自动完成永恒挑战的特权节点。此后若无特别说明，所有时间均指<i>游戏时间</i>。需注意：当涉及需<i>减少</i>耗时的机制（如现实升级“快速复现”）时同样适用此规则。
 <br>  
 可使用现实机器购买黑洞升级：  
 <br>  
@@ -853,7 +853,7 @@ ${Ra.unlocks.glyphEffectCount.canBeApplied
 <br>  
 黑洞充能将游戏速度降至 ${formatInt(1)} 为代价存储游戏时间，实质是将加速效果转化为可存储的时间资源。其主要用途是释放黑洞——消耗存储的游戏时间直接跳过等量时长。与常规加速不同，放电时不受任何游戏速度修正影响（仅存储时受影响）。  
 <br>  
-存储现实时间会完全停止生产（相当于暂停游戏）。每经过1秒现实时间，按效率系数转化为存储值。可在符文页使用存储的现实时间强化现实——完成时将一次性消耗所有存储时间，重复执行完全相同的现实并累积所有奖励。例如：存储 ${formatInt(50)} 分钟且强化耗时 ${formatInt(10)} 分钟的现实（原奖励 ${format(DC.E30)} 现实机器与 ${format(DC.E12)} 遗迹碎片），将获得 ${format(5e30)} 现实机器、${format(5e12)} 遗迹碎片、${formatInt(5)} 个符文（依筛选设置）及 ${formatInt(5)} 复兴点。  
+存储现实时间会完全停止生产（相当于暂停游戏）。每经过1秒现实时间，按效率系数转化为存储值。可在符文页使用存储的现实时间强化现实——完成时将一次性消耗所有存储时间，重复执行完全相同的现实并累积所有奖励。例如：存储 ${formatInt(50)} 分钟且强化耗时 ${formatInt(10)} 分钟的现实（原奖励 ${format(DC.E30)} 现实机器与 ${format(DC.E12)} 遗迹碎片），将获得 ${format(5e30)} 现实机器、${format(5e12)} 遗迹碎片、${formatInt(5)} 个符文（依筛选设置）及 ${formatInt(5)} 特权点。
 <br>  
 若现实耗时不足 ${formatInt(1)} 秒，则强化倍数受存储秒数限制。例如存储 ${formatInt(1000)} 秒时强化耗时 ${format(0.2, 2, 2)} 秒的现实，将消耗 ${formatInt(200)} 秒模拟 ${formatInt(1000)} 次现实。  
 <br>  
@@ -911,7 +911,7 @@ ${VUnlocks.vAchievementUnlock.isUnlocked
 - 每个薇成就还会给予你一个空间之理。
 <br>
 <br>
-通过获得 ${formatInt(2)} 个薇成就解锁的目标降低功能，允许你通过消耗复兴点来使某些薇成就要求更容易完成，最低可降至最简单层级的要求。降低目标的价格不会随着使用而增加，并且也会降低未来层级的要求。
+通过获得 ${formatInt(2)} 个薇成就解锁的目标降低功能，允许你通过消耗特权点来使某些薇成就要求更容易完成，最低可降至最简单层级的要求。降低目标的价格不会随着使用而增加，并且也会降低未来层级的要求。
 <br>
 <br>
 空间之理允许你购买通常被禁止的时间研究，比如改进无限点公式后的多路径分支，或者底部成对黑暗/光明研究中的两项。和时间理数一样，每次重置研究时都会全额返还。拥有足够的空间之理后，你最终可以一次性购买所有时间研究！
@@ -978,7 +978,7 @@ ${Ra.unlocks.vUnlock.canBeApplied
       // Oh god I'm so sorry this is so many words
       tags: ["reality", "lategame", "endgame", "ra", "effarig", "alchemy", "power", "infinity", "time", "replication",
         "dilation", "cardinality", "eternity", "dimensionality", "inflation", "alternation", "synergism", "momentum",
-        "decoherence", "force", "exponential", "uncountability", "boundless", "unpredictability", "multiversal",
+        "decoherence", "force", "exponential", "uncountability", "不可数性", "boundless", "unpredictability", "multiversal",
         "reaction"],
       tab: "reality/alchemy"
     }, {
@@ -993,23 +993,23 @@ ${Ra.unlocks.vUnlock.canBeApplied
       isUnlocked: () => Ra.unlocks.unlockGlyphAlchemy.canBeApplied,
       tags: ["reality", "lategame", "endgame", "ra", "effarig", "alchemy", "power", "infinity", "time", "replication",
         "dilation", "cardinality", "eternity", "dimensionality", "inflation", "alternation", "synergism", "momentum",
-        "decoherence", "force", "exponential", "uncountability", "boundless", "unpredictability", "multiversal",
+        "decoherence", "force", "exponential", "uncountability", "不可数性", "boundless", "unpredictability", "multiversal",
         "reaction"],
       tab: "reality/alchemy"
     }, {
-      name: "虚幻机器",
+      name: "虚数机器",
       info: () => `
-当你能够在单次现实中获得至少 ${format(MachineHandler.baseRMCap)} 现实机器时，便可以获取名为“虚幻机器”的新资源。现实机器也将被硬上限锁定在 ${format(MachineHandler.baseRMCap)}；你将无法获得超过此上限的现实机器。  
+当你能够在单次现实中获得至少 ${format(MachineHandler.baseRMCap)} 现实机器时，便可以获取名为“虚数机器”的新资源。现实机器也将被硬上限锁定在 ${format(MachineHandler.baseRMCap)}；你将无法获得超过此上限的现实机器。
 <br>  
-此外，你还将解锁“虚幻升级”标签页，其中包含一组类似于现实升级的升级项目——每项升级都有必须满足的解锁条件，以及实际购买所需的虚幻机器消耗。前两行升级可重复购买，其余三行为一次性升级。  
+此外，你还将解锁“虚数升级”标签页，其中包含一组类似于现实升级的升级项目——每项升级都有必须满足的解锁条件，以及实际购买所需的虚数机器消耗。前两行升级可重复购买，其余三行为一次性升级。
 <br>  
-你的虚幻机器数量受两个因素影响：  
+你的虚数机器数量受两个因素影响：
 <br>  
-<b>虚幻机器上限</b> — 你所能拥有的虚幻机器最大数量，取决于若无上限时你本可获得的最高现实机器数量。该值会持续更新，一旦你超过之前无上限时的最高现实机器量，上限便会立即提升。  
+<b>虚数机器上限</b> — 你所能拥有的虚数机器最大数量，取决于若无上限时你本可获得的最高现实机器数量。该值会持续更新，一旦你超过之前无上限时的最高现实机器量，上限便会立即提升。
 <br>  
-<b>当前虚幻机器</b> — 随时间推移，你的当前虚幻机器会被动向上限增长，且越接近上限增速越慢（呈指数级减缓）。默认情况下，虚幻机器的增长速度为：你<i>缺少</i>的部分（即上限减当前值）每减少一半。此增速不受任何游戏速度的影响。  
+<b>当前虚数机器</b> — 随时间推移，你的当前虚数机器会被动向上限增长，且越接近上限增速越慢（呈指数级减缓）。默认情况下，你<i>缺少</i>的部分（即上限减当前值）每 ${formatInt(60)} 秒减少一半，虚数升级可缩短这一时间。该机制使用现实时间，不随游戏时间速度变化。
 <br>  
-虚幻升级将解锁最后两位天神。
+虚数升级将解锁最后两位天神。
 `,
       isUnlocked: () => MachineHandler.isIMUnlocked,
       tags: ["imaginary", "machines", "reality", "lategame", "endgame"],
@@ -1018,10 +1018,10 @@ ${Ra.unlocks.vUnlock.canBeApplied
       name: "维度之神莱特拉",
       alias: "莱特拉",
       info: () => `
-      莱特拉是第六位天神，通过购买对应的虚幻升级（消耗 ${format(ImaginaryUpgrade(15).cost)} 虚幻机器）解锁。
+      莱特拉是第六位天神，通过购买对应的虚数升级（消耗 ${format(ImaginaryUpgrade(15).cost)} 虚数机器）解锁。
 <br>
 <br>
-莱特拉引入了一种名为“暗物质”的新货币，其效果根据你曾拥有的最高暗物质数量为连续统提供倍数加成。暗物质由暗物质维度以类似于游戏中其他维度的方式产生。与其他维度不同，暗物质维度只有四个而非八个。你一开始即可解锁第一个暗物质维度，更高的维度通过虚幻升级解锁。解锁维度时你会获得 ${formatInt(1)} 个该维度，且在没有更高层级维度生产的情况下无法获得更多数量。
+莱特拉引入了一种名为“暗物质”的新货币，其效果根据你曾拥有的最高暗物质数量为连续统提供倍数加成。暗物质由暗物质维度以类似于游戏中其他维度的方式产生。与其他维度不同，暗物质维度只有四个而非八个。你一开始即可解锁第一个暗物质维度，更高的维度通过虚数升级解锁。解锁维度时你会获得 ${formatInt(1)} 个该维度，且在没有更高层级维度生产的情况下无法获得更多数量。
 <br>
 <br>
 每个暗物质维度经过一定时间间隔后会产生两种东西：暗物质或上一级暗物质维度，以及另一种名为“暗能量”的资源。暗物质和暗物质维度的单次间隔产量等于暗物质倍数与当前维度数量的乘积，而暗能量产量与维度数量无关。暗能量用于产生奇点，相关机制有独立的游戏帮助条目。
@@ -1030,7 +1030,7 @@ ${Ra.unlocks.vUnlock.canBeApplied
 暗物质维度的时间间隔可升级，最低可降至 ${formatInt(10)} 毫秒，此后无法继续缩减间隔。达到该极限后，你可以选择“飞升”该暗物质维度，每次飞升会使暗物质获取量初始提升 ${formatInt(POWER_DM_PER_ASCENSION)} 倍，暗能量获取量初始提升 ${formatInt(POWER_DE_PER_ASCENSION)} 倍。飞升后时间间隔会乘以 ${formatInt(1200)}，但可以再次进行升级。当间隔再次达到 ${formatInt(10)} 毫秒时，你即可再次选择飞升。
 <br>
 <br>
-一项虚幻升级允许你解锁名为“湮灭”的重置机制。湮灭会重置暗物质和暗物质维度，但会为暗物质增加一个永久性倍数加成，该加成适用于所有暗物质维度。你可以多次进行湮灭，每次叠加的倍数为加法累加，无需每次都追求更高的加成增量。进行湮灭需要至少拥有 ${format(Laitela.annihilationDMRequirement)} 暗物质。
+一项虚数升级允许你解锁名为“湮灭”的重置机制。湮灭会重置暗物质和暗物质维度，但会为暗物质增加一个永久性倍数加成，该加成适用于所有暗物质维度。你可以多次进行湮灭，每次叠加的倍数为加法累加，无需每次都追求更高的加成增量。进行湮灭需要至少拥有 ${format(Laitela.annihilationDMRequirement)} 暗物质。
 <br>
 <br>
 莱特拉拥有一个专属现实，会根据你在其中的表现给予暗物质维度暗物质力量的倍数加成。若你在 ${formatInt(30)} 秒内完成该现实，则在后续挑战中你当前最高等级的维度将被永久禁用。若连续八次在 ${formatInt(30)} 秒内完成现实使所有维度被禁用，你还会获得暗能量获取量 ${formatX(8)} 的倍数加成。
@@ -1087,7 +1087,7 @@ ${Ra.unlocks.vUnlock.canBeApplied
       name: "反物质之神佩勒",
       alias: "佩勒",
       info: () => `
-当你购买最后一项虚幻升级并解锁佩勒后，你将解锁其标签页，其中包含一个“毁灭你的现实”按钮。要毁灭现实，你必须已完成先前的全部 ${formatInt(17)} 行成就，并拥有每种炼金资源 ${formatInt(25000)} 点。
+当你购买最后一项虚数升级并解锁佩勒后，你将解锁其标签页，其中包含一个“毁灭你的现实”按钮。要毁灭现实，你必须已完成先前的全部 ${formatInt(17)} 行成就，并拥有每种炼金资源 ${formatInt(25000)} 点。
 <br>
 <br>
 ${Pelle.isDoomed

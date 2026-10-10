@@ -34,10 +34,12 @@ export default {
       游戏采用渐进式分层玩法，包含多重声望系统。“游戏帮助”按钮提供进度攻略指南。
       <br>
       <br>
-      本游戏的英文原版是<a href="https://ivark.githu.io/AntimatterDimensions">Antimatter Dimensions</a>。这个版本为基于原版的汉化版，大部分采用了安卓版翻译，同时也独自翻译了一部分文本。目前该版本完成了大部分内容的翻译，并且持续更新。
+      本游戏的英文原版是<a href="https://ivark.github.io/AntimatterDimensions">Antimatter Dimensions</a>。这个版本为基于原版的汉化版，大部分采用了安卓版翻译，同时也独自翻译了一部分文本。目前该版本完成了大部分内容的翻译，并且持续更新。
       <br>
       <br>
-      特别感谢安卓版翻译者对反物质维度中文社区做出的贡献。
+      特别感谢安卓版翻译者对反物质维度中文社区做出的贡献。<br><br>
+      YC自用版基于 <a href="https://github.com/aquamarine309/ADChinese">aquamarine309 的汉化版</a>，保留原作者、开发团队和汉化贡献者署名及 MIT 许可证。
+      <br>个人使用，请勿传播。<a href="https://github.com/Chen13754/ADChinese">个人版源码</a>
     </div>
     <div
       class="l-socials"

@@ -41,18 +41,18 @@ export default {
       重置游戏
     </template>
     <div class="c-modal-message__text">
-      请确认是否硬重置本存档槽位。  
+      请确认是否硬重置本存档槽位。
       <span class="c-modal-hard-reset-danger">删除存档不会解锁任何隐藏内容。</span>
       输入“花开花落，尽归尘土。缘起缘灭，曲终人散。”以确认。
       <div class="c-modal-hard-reset-danger">
-        这将清除你的存档！
+        这将清除当前存档槽的进度，其它存档槽保留！
         <span v-if="hasExtraNG">
           <br>
           这也会移除你通过完成游戏解锁的所有符文皮肤！
         </span>
         <span v-if="hasSpeedrun">
           <br>
-          你将失去速通资格。若要重新开始速通，请使用"Start Speedrun"按钮。
+          你将失去速通资格。若要重新开始速通，请使用“开始速通”按钮。
         </span>
       </div>
     </div>

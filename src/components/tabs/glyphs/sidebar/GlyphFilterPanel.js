@@ -164,7 +164,7 @@ export default {
       this.setRarityThreshold(type, newRarity);
     },
     showFilterHowTo() {
-      ui.view.h2pForcedTab = GameDatabase.h2p.tabs.filter(tab => tab.name === "Advanced Glyph Mechanics")[0];
+      ui.view.h2pForcedTab = GameDatabase.h2p.tabs.filter(tab => tab.name === "高级符文机制")[0];
       Modal.h2p.show();
     },
     getSymbol(type) {
@@ -248,9 +248,9 @@ export default {
       class="c-glyph-sacrifice-options__advanced"
     >
       <br>
-      符文选分机制基于类型分配：系统将优先选择你当前符文献祭总值最低的类型所属符文。  
-      <br>  
-      <br>  
+      符文选分机制基于类型分配：系统将优先选择你当前符文献祭总值最低的类型所属符文。
+      <br>
+      <br>
       该模式从不保留符文，且必定献祭所选中的符文。
     </div>
     <div

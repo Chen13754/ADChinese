@@ -67,7 +67,7 @@ class AlchemyResourceState extends GameMechanicState {
   }
 
   get lockText() {
-    return `${this.unlockedWith.name} Level ${formatInt(this.unlockedAt)}`;
+    return `${this.unlockedWith.name} 等级 ${formatInt(this.unlockedAt)}`;
   }
 
   get isCustomEffect() {

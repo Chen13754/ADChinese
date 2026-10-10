@@ -120,7 +120,7 @@ export const imaginaryUpgrades = [
     checkRequirement: () => Object.values(player.celestials.effarig.glyphWeights).some(w => w === 100) &&
       gainedGlyphLevel().actualLevel >= 9000,
     checkEvent: GAME_EVENT.REALITY_RESET_BEFORE,
-    description: "基于可重复购买虚幻升级的数量，获得免费的维度提升",
+    description: "基于可重复购买虚数升级的数量，获得免费的维度提升",
     effect: () => 2e4 * ImaginaryUpgrades.totalRebuyables,
     formatEffect: value => `${format(value, 1)}`,
     isDisabledInDoomed: true
@@ -135,7 +135,7 @@ export const imaginaryUpgrades = [
     checkRequirement: () => Enslaved.isRunning &&
       MachineHandler.uncappedRM.times(simulatedRealityCount(false) + 1).gte(Number.MAX_VALUE),
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
-    description: "基于虚幻升级的购买数量，提升虚幻机器的上限",
+    description: "基于虚数升级的购买数量，提升虚数机器的上限",
     effect: () => 1 + ImaginaryUpgrades.totalRebuyables / 20 + ImaginaryUpgrades.totalSinglePurchase / 2,
     formatEffect: value => formatX(value, 2, 1),
     isDisabledInDoomed: true
@@ -227,7 +227,7 @@ export const imaginaryUpgrades = [
     hasFailed: () => false,
     checkRequirement: () => Laitela.matterExtraPurchaseFactor >= 2,
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
-    description: () => `你可以自动购买可重复购买的虚幻升级，虚幻机器数量的增速是原来的 ${formatInt(10)} 倍`,
+    description: () => `你可以自动购买可重复购买的虚数升级，虚数机器数量的增速是原来的 ${formatInt(10)} 倍`,
     effect: 10,
     isDisabledInDoomed: true
   },
@@ -242,7 +242,7 @@ export const imaginaryUpgrades = [
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
     canLock: true,
     lockEvent: "启用连续统",
-    description: "基于虚幻机器的数量，提升湮灭加成的倍率",
+    description: "基于虚数机器的数量，提升湮灭加成的倍率",
     effect: () => Math.clampMin(Math.pow(Math.log10(Currency.imaginaryMachines.value) - 10, 3), 1),
     formatEffect: value => formatX(value, 2, 1),
     isDisabledInDoomed: true

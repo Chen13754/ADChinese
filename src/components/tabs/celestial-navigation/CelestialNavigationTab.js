@@ -102,12 +102,16 @@ export default {
       center: false,
       fit: false,
       zoomScaleSensitivity: 0.3,
-      minZoom: 0.64,
+      minZoom: window.innerWidth <= 1024 ? 0.15 : 0.64,
       maxZoom: 1.5,
       beforePan: panLimiter,
     });
-    if (CelestialNavigationViewportCache.pan) this.panZoom.pan(CelestialNavigationViewportCache.pan);
-    if (CelestialNavigationViewportCache.zoom) this.panZoom.zoom(CelestialNavigationViewportCache.zoom);
+    if (window.innerWidth <= 1024 && !CelestialNavigationViewportCache.visited) { this.panZoom.zoom(0.35); this.panZoom.center(); }
+    else {
+      if (CelestialNavigationViewportCache.pan) this.panZoom.pan(CelestialNavigationViewportCache.pan);
+      if (CelestialNavigationViewportCache.zoom) this.panZoom.zoom(CelestialNavigationViewportCache.zoom);
+    }
+    CelestialNavigationViewportCache.visited = true;
   },
   beforeDestroy() {
     if (this.panZoom) {
@@ -137,6 +141,7 @@ export default {
   template: `
   <!-- Need to wrap whole thing in a div because of properties applied to tabs -->
   <div>
+    <div class="yc-tree-tools"><button class="o-primary-btn" @click="panZoom.zoomOut()">缩小</button><button class="o-primary-btn" @click="panZoom.zoomIn()">放大</button><button class="o-primary-btn" @click="panZoom.center()">居中</button></div>
     <svg
       ref="celestialNavigationSVG"
       class="c-wide-canvas-element l-celestial-navigation"

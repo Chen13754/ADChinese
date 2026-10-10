@@ -1,3 +1,4 @@
+import YCMobileNavigation from "./YCMobileNavigation.js";
 import BackgroundAnimations from "./BackgroundAnimations.js";
 import ClassicUi from "./ui-modes/classic/ClassicUi.js";
 import GameUiComponentFixed from "./GameUiComponentFixed.js";
@@ -12,6 +13,7 @@ export default {
   name: "GameUIComponent",
   components: {
     ...TabComponents,
+    YCMobileNavigation,
     ClassicUi,
     ModernUi,
     GameUiComponentFixed,
@@ -50,6 +52,7 @@ export default {
     class="ui-wrapper"
     data-v-game-ui-component
   >
+    <YCMobileNavigation />
     <div
       id="ui"
       class="c-game-ui"
@@ -68,6 +71,7 @@ export default {
         :href="themeCss"
       >
     </div>
+    <link rel="stylesheet" href="./public/stylesheets/yc.css">
     <GameUiComponentFixed v-if="!isThemeS12" />
     <BackgroundAnimations v-if="!isThemeS12" />
     <S12UiFixed v-if="isThemeS12" />

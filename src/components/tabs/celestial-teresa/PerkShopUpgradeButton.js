@@ -56,7 +56,7 @@ export default {
       <CostDisplay
         v-if="!isCapped"
         :config="upgrade.config"
-        name="复兴点数"
+        name="特权点"
       />
     </button>
   </div>

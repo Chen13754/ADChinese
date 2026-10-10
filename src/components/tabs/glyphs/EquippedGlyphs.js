@@ -29,13 +29,13 @@ export default {
     },
     respecTooltip() {
       const reset = Pelle.isDoomed ? "末日" : "现实";
-      return this.respec  
-        ? `卸下后，${reset}后将把当前装备的符文移回仓库。`  
+      return this.respec
+        ? `卸下后，${reset}后将把当前装备的符文移回仓库。`
         : `当前装备的符文将在${reset}后保持生效状态！`;
     },
     undoTooltip() {
-      return !this.undoSlotsAvailable ? "仓库空间不足，无法卸下符文。" : (this.undoAvailable  
-      ? "撤销最近装备的符文，并将现实返回至装备前的状态（多数资源将完全重置）。"  
+      return !this.undoSlotsAvailable ? "仓库空间不足，无法卸下符文。" : (this.undoAvailable
+      ? "撤销最近装备的符文，并将现实返回至装备前的状态（多数资源将完全重置）。"
       : "仅可撤销本轮现实中装备的符文操作。");
     },
     unequipText() {
@@ -146,7 +146,7 @@ export default {
     clickGlyph(glyph, idx, increaseSound = false) {
       if (Glyphs.isMusicGlyph(glyph)) {
         const sound = idx + (increaseSound ? 6 : 1);
-        new Audio(`../../../../public/audio/note${sound}.mp3`).play();
+        new Audio(new URL(`../../../../public/audio/note${sound}.mp3`, import.meta.url).href).play();
       }
     }
   },

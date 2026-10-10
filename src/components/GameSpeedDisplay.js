@@ -35,9 +35,9 @@ export default {
   },
   methods: {
     update() {
-      this.baseSpeed = getGameSpeedupFactor();
+      this.baseSpeed = getGameSpeedupFactor(undefined, undefined, true);
       this.pulsedSpeed = getGameSpeedupForDisplay();
-      this.hasSeenAlteredSpeed = PlayerProgress.seenAlteredSpeed();
+      this.hasSeenAlteredSpeed = PlayerProgress.seenAlteredSpeed() || YC.selectedRate("gameTime") > 1;
       this.isStopped = Enslaved.isStoringRealTime;
       this.isEC12 = EternityChallenge(12).isRunning;
       this.isPulsing = (this.baseSpeed !== this.pulsedSpeed) && Enslaved.canRelease(true);

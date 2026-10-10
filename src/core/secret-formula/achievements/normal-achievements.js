@@ -786,7 +786,7 @@ export const normalAchievements = [
     checkEvent: GAME_EVENT.CHALLENGE_FAILED,
     reward: "成就感逐渐消失。",
     // 不显示，无需翻译
-    effect: () => "Sense of accomplishment (fading)"
+    effect: () => "成就感（正在消退）"
   },
   {
     id: 115,
@@ -1058,7 +1058,7 @@ export const normalAchievements = [
   {
     id: 146,
     name: "伟大复兴",
-    description: "购买复兴树的所有节点。",
+    description: "购买特权树的所有节点。",
     checkRequirement: () => player.reality.perks.size === Perks.all.length,
     checkEvent: GAME_EVENT.PERK_BOUGHT,
     get reward() { return `符文稀有度 +${formatPercents(0.01)}。`; },
@@ -1113,7 +1113,7 @@ export const normalAchievements = [
     get description() { return `在游戏内时间 ${formatInt(5)} 秒内达成现实。`; },
     checkRequirement: () => Time.thisReality.totalSeconds <= 5,
     checkEvent: GAME_EVENT.REALITY_RESET_BEFORE,
-    get reward() { return `现实时有 ${formatPercents(0.1)} 的概率，获得的现实次数和复兴点数 ${formatX(2)}。`; },
+    get reward() { return `现实时有 ${formatPercents(0.1)} 的概率，获得的现实次数和特权点 ${formatX(2)}。`; },
     effect: 0.1
   },
   {

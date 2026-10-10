@@ -136,7 +136,7 @@ export default {
       V.checkForUnlocks();
     },
     reductionTooltip(hex) {
-      return `花费 ${format(hex.reductionCost, 2, 0)} 复兴点数以降低 ${format(hex.config.perReductionStep)} 的需求`;
+      return `花费 ${format(hex.reductionCost, 2, 0)} 特权点以降低 ${format(hex.config.perReductionStep)} 的需求`;
     },
     hexColor(hex) {
       const completions = hex.completions;
@@ -210,7 +210,7 @@ export default {
         v-if="showReduction"
         class="c-v-info-text"
       >
-        你拥有 {{ format(pp, 2, 0) }} 复兴点数。
+        你拥有 {{ format(pp, 2, 0) }} 特权点。
       </div>
       <div class="l-v-unlocks-container">
         <li
@@ -278,7 +278,7 @@ export default {
             >
               <span v-if="isRunning">你目前在薇的现实中</span>
               <span v-else>开始薇的现实</span>
-              
+
             </b>
             <br>
             <div :style="{ 'font-size': hasAlchemy ? '1.2rem' : '' }">

@@ -3,7 +3,7 @@ import TaskbarIcon from "./TaskbarIcon.js";
 
 import { S12Windows } from "./windows.js";
 
-const startupSound = new Audio("../../../../public/audio/s12-startup.mp3");
+const startupSound = new Audio(new URL("../../../../public/audio/s12-startup.mp3", import.meta.url).href);
 export default {
   name: "S12Taskbar",
   components: {

@@ -34,7 +34,7 @@ export default {
         this.save.antimatter
       ];
       const names = ["现实碎片",
-        "虚幻机器上限",
+        "虚数机器上限",
         "现实机器",
         "永恒点数",
         "无限点数",

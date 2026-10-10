@@ -9,7 +9,7 @@ export default {
     tabs: () => Tabs.oldUI,
   },
   template: `
-  <div>
+  <div class="l-old-ui__tab-bar">
     <ClassicTabButton
       v-for="(tab, i) in tabs"
       :key="i"

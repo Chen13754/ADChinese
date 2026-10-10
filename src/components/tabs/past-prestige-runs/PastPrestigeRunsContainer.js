@@ -50,7 +50,7 @@ export default {
     },
     points() {
       const rawText = this.layer.currency;
-      return rawText === "现实机器" && this.hasIM ? "虚幻机器上限" : rawText;
+      return rawText === "现实机器" && this.hasIM ? "虚数机器上限" : rawText;
     },
     condition() {
       return this.layer.condition();
@@ -164,7 +164,7 @@ export default {
       return timeDisplayShort(run[1]);
     },
     prestigeCurrencyGain(run) {
-      if (this.hasIM && this.layer.name === "现实") return `${format(run[7], 2)} 虚幻机器`;
+      if (this.hasIM && this.layer.name === "现实") return `${format(run[7], 2)} 虚数机器`;
       return `${format(run[2], 2)} ${this.points}`;
     },
     prestigeCountGain(run) {

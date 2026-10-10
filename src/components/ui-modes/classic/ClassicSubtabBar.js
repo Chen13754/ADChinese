@@ -24,7 +24,7 @@ export default {
   template: `
   <div
     v-if="isVisible"
-    class="c-subtab-button-container"
+    class="c-subtab-button-container l-old-ui__subtab-bar"
   >
     <ClassicSubtabButton
       v-for="(subtab, i) in subtabs"

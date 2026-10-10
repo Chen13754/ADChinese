@@ -1,0 +1,273 @@
+/* Reflow native controls and reuse all original theme variables and assets. */
+.yc-brand { position: fixed; bottom: 1rem; right: 1rem; z-index: 6; text-align: right; font-size: 1.1rem; color: var(--color-text); background: var(--color-base); padding: .4rem .7rem; border: 1px solid var(--color-accent); }
+.yc-brand small { display: block; opacity: .75; }
+.yc-mobile-header, .yc-mobile-subtabs { display: none; }
+.yc-console, .yc-export { width: 58rem; max-width: 100%; text-align: left; line-height: 1.6; font-size: 1.4rem; }
+.yc-console { max-height: 72dvh; overflow-y: auto; overscroll-behavior: contain; padding: 0 1rem 1rem; }
+.yc-console h3 { margin: 1.5rem 0 .5rem; color: var(--color-accent); }
+.yc-control-row { padding: 1rem 0; border-bottom: 1px solid var(--color-accent); }
+.yc-control-row p { font-size: 1.2rem; margin: .3rem 0 .7rem; }
+.yc-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.yc-actions .o-primary-btn { min-width: 5rem; min-height: 3.6rem; margin: 0; padding: .5rem; }
+.yc-actions input { flex: 1 1 10rem; width: 10rem; min-width: 5rem; height: 3.6rem; margin: 0; }
+.yc-timer-label { display: flex; align-items: center; gap: .8rem; min-height: 3.6rem; cursor: pointer; }
+.yc-timer-label input { width: 2rem; height: 2rem; accent-color: var(--color-accent); }
+.yc-resource-value { font-weight: normal; opacity: .8; overflow-wrap: anywhere; }
+.yc-warning, .yc-status { color: var(--color-accent); }
+.yc-status { position: sticky; bottom: -.5rem; background: var(--color-base); padding: .5rem 0; min-height: 2rem; }
+.yc-export textarea { box-sizing: border-box; width: 100%; height: 16rem; font-family: monospace; overflow-wrap: anywhere; }
+.yc-save-help { max-width: 64rem; margin: 1rem auto; line-height: 1.6; }
+.yc-console-entry { margin: 1rem; min-height: 4.4rem; }
+.yc-speed-badge { position: fixed; right: 1rem; bottom: 6rem; z-index: 20; padding: .7rem; min-height: 4.4rem; pointer-events: auto; }
+.yc-tree-viewport { width: 100%; max-width: 100%; overflow: auto; max-height: 75dvh; border: 1px solid var(--color-accent); overscroll-behavior: contain; }
+.yc-tree-viewport > div { position: relative; }
+.yc-tree-tools { display: flex; align-items: center; justify-content: center; gap: 1rem; margin: 1rem; }
+.yc-tree-tools input { width: 12rem; vertical-align: middle; }
+button:focus-visible, [tabindex]:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+@media (max-width: 1024px) {
+  #ui-container .l-challenge-grid, #ui-container .l-options-grid, #ui-container .l-reality-upgrade-grid { width: 100%; max-width: 100%; }
+  #ui-container .l-options-grid__row, #ui-container .l-reality-upgrade-grid__row { flex-wrap: wrap; justify-content: center; }
+  #ui-container .l-challenge-grid__cell { max-width: calc(100% - 1rem); margin: .5rem; }
+  #ui-container .c-challenge-box { width: 100%; max-width: 40rem; height: auto; min-height: 13rem; }
+}
+@media (max-width: 1024px) {
+  :root { --sidebar-width: 0rem; }
+  html, body { width: 100%; height: 100%; }
+  #ui-container { font-size: 1.4rem; line-height: 1.45; }
+  #ui-container *, #ui-container *::before, #ui-container *::after { box-sizing: border-box; }
+  #ui-container .c-modern-sidebar, #ui-container .l-old-ui__tab-bar, #ui-container .l-old-ui__subtab-bar { display: none; }
+  #ui-container .yc-brand { display: none; }
+  #ui-container .yc-mobile-header { display: flex; align-items: center; justify-content: space-between; gap: .8rem; height: calc(5.6rem + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 1rem 0; position: fixed; top: 0; left: 0; width: 100%; z-index: 30; color: var(--color-text); background: var(--color-base); border-bottom: 1px solid var(--color-accent); }
+  #ui-container .yc-mobile-header button { height: 4.4rem; min-width: 4.4rem; margin: 0; padding: .5rem .8rem; font-size: 1.3rem; }
+  #ui-container .yc-mobile-subtabs { display: flex; gap: .5rem; align-items: center; overflow-x: auto; width: 100%; height: 5rem; padding: .3rem 1rem; position: fixed; top: calc(5.6rem + env(safe-area-inset-top)); left: 0; z-index: 29; background: var(--color-base); border-bottom: 1px solid var(--color-accent); }
+  #ui-container .yc-mobile-subtabs button { flex: 0 0 auto; display: flex; align-items: center; gap: .6rem; min-height: 4.4rem; padding: .5rem 1rem; font-size: 1.3rem; }
+  #ui-container .yc-selected { box-shadow: inset 0 -.3rem var(--color-accent); }
+  #ui-container .yc-nav-backdrop { position: fixed; inset: 0; background: #0009; z-index: 40; pointer-events: auto; }
+  #ui-container .yc-drawer { display: flex; flex-direction: column; gap: .5rem; width: min(86vw, 32rem); height: 100dvh; overflow-y: auto; padding: calc(1rem + env(safe-area-inset-top)) 1rem 2rem; background: var(--color-base); color: var(--color-text); border-right: 1px solid var(--color-accent); }
+  #ui-container .yc-drawer > button { min-height: 4.8rem; text-align: left; padding: .8rem 1rem; font-size: 1.5rem; }
+  #ui-container .yc-drawer > small { padding: 1.5rem .5rem; line-height: 1.7; }
+  #ui-container .yc-drawer-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  #ui-container .yc-drawer-title button { min-height: 4.4rem; padding: .5rem; }
+  #ui-container .c-game-ui { padding-top: calc(10.6rem + env(safe-area-inset-top)); }
+  #ui-container .game-container { width: 100%; margin-left: 0; }
+  #ui-container .tab-container, #ui-container .c-game-tab, #ui-container .l-old-ui__page { width: 100%; min-width: 0; max-width: 100%; padding-left: .8rem; padding-right: .8rem; }
+  #ui-container .c-old-ui { padding: 0 .5rem 5rem; }
+  #ui-container .c-game-tab { padding-bottom: 6rem; overflow-wrap: anywhere; }
+  #ui-container .modes-container { flex-wrap: wrap; gap: .8rem; padding: 1rem 0; }
+  #ui-container .modes-container button { flex: 1 1 13rem; height: auto; min-height: 4.4rem; width: auto; font-size: 1.3rem; }
+  #ui-container .c-dimension-row { display: flex; flex-direction: column; height: auto; min-height: 11rem; padding: 1.2rem .5rem; gap: .8rem; border-bottom: 1px solid var(--color-accent); }
+  #ui-container .l-dimension-text-container { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); width: 100%; height: auto; gap: .5rem; }
+  #ui-container .l-narrow-box, #ui-container .l-wide-box { min-width: 0; width: 100%; flex-direction: column; align-items: flex-start; gap: .3rem; }
+  #ui-container .c-dim-row__large { font-size: 1.5rem; margin: 0; overflow-wrap: anywhere; }
+  #ui-container .c-dim-row__small { font-size: 1.25rem; margin: 0; overflow-wrap: anywhere; }
+  #ui-container .l-dim-row-multi-button-container { display: flex; flex-wrap: wrap; width: 100%; min-width: 0; gap: .6rem; }
+  #ui-container .l-dim-row-multi-button-container > * { flex: 1 1 12rem; min-width: 0; width: auto; margin: 0; min-height: 4.4rem; }
+  #ui-container .o-primary-btn--new, #ui-container .o-primary-btn--buy-id, #ui-container .o-primary-btn--buy-td { width: 100%; min-width: 0; height: auto; min-height: 5rem; font-size: 1.35rem; }
+  #ui-container .resets-container { flex-direction: column; width: 100%; gap: 1.5rem; padding: 1.5rem 0; }
+  #ui-container .resets-container > * { width: 100%; max-width: 100%; }
+  #ui-container .c-prestige-button-container { width: 100%; min-width: 0; max-width: 100%; padding: .5rem; }
+  #ui-container .l-game-header__buttons-line, #ui-container .c-prestige-header { flex-wrap: wrap; width: 100%; gap: 1rem; }
+  #ui-container .c-game-header__antimatter { font-size: 2.4rem; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+  #ui-container .c-game-tab button, #ui-container .c-game-tab .o-primary-btn, #ui-container .c-game-tab input[type=button] { min-height: 4.4rem; max-width: 100%; }
+  #ui-container .l-options-tab, #ui-container .l-challenges-tab, #ui-container .l-infinity-upgrades-tab, #ui-container .l-eternity-upgrades-tab { width: 100%; min-width: 0; max-width: 100%; }
+  #ui-container .l-options-grid__row { gap: .7rem; width: 100%; }
+  #ui-container .l-options-grid__row > * { flex: 1 1 14rem; max-width: 100%; min-width: 0; margin: .4rem 0; }
+  #ui-container .l-options-grid__button, #ui-container .o-primary-btn--option { width: auto; height: auto; min-height: 6rem; padding: .8rem; font-size: 1.3rem; }
+  #ui-container .l-reality-upgrade-grid__row { display: flex; gap: .6rem; }
+  #ui-container .l-reality-upgrade-btn { flex: 1 1 calc(50% - .6rem); max-width: calc(50% - .6rem); margin: .3rem 0; }
+  #ui-container .c-reality-upgrade-btn { width: 100%; height: auto; min-height: 15rem; padding: .7rem; }
+  #ui-container .c-modal { max-width: calc(100vw - 1.6rem); max-height: calc(100dvh - 2rem); overflow-y: auto; margin: 0; font-size: 1.4rem; padding: 1rem; }
+  #ui-container .c-modal__title { font-size: 1.8rem; padding-right: 3rem; }
+  #ui-container .c-modal__close-btn { width: 4.4rem; height: 4.4rem; font-size: 2rem; right: 0; top: 0; }
+  #ui-container .c-modal__inner, #ui-container .l-modal-content--centered { max-width: 100%; min-width: 0; }
+  #ui-container .c-modal-input { max-width: 100%; min-height: 4.4rem; font-size: 1.6rem; }
+  #ui-container .c-modal button, #ui-container .c-modal .o-primary-btn { min-height: 4.4rem; max-width: 100%; padding: .6rem; font-size: 1.35rem; }
+  #ui-container .l-modal-buttons { flex-wrap: wrap; }
+  #ui-container .yc-console, #ui-container .yc-export { width: 100%; padding: 0; }
+  #ui-container .yc-console { max-height: 73dvh; }
+  #ui-container .yc-actions { gap: .5rem; }
+  #ui-container .yc-actions input { flex-basis: 10rem; }
+  #ui-container .yc-control-row p { font-size: 1.3rem; }
+  #ui-container .yc-timer-label { min-height: 4.4rem; }
+  #ui-container .yc-tree-tools { flex-wrap: wrap; }
+  #ui-container .l-time-studies-tab { width: 100%; padding-bottom: 20rem; }
+  #ui-container .l-time-studies-tab__tt-shop { left: 0; width: 100%; max-width: 100%; }
+  #ui-container .l-tt-buy-button { width: auto; min-width: 0; flex: 1 1 0; min-height: 4.4rem; }
+  #ui-container .c-perk-tab { width: 100%; height: 70dvh; min-height: 40rem; }
+  #ui-container .c-perk-network { width: 100%; }
+  #ui-container .l-notification-container { max-width: 95vw; }
+  #ui-container .o-achievement__tooltip { max-width: calc(100vw - 2rem); }
+  #ui-container .c-game-tab .o-achievement:focus .o-achievement__tooltip { opacity: 1; visibility: visible; }
+  #ui-container .l-save-timer { font-size: 1rem; }
+  #ui-container .yc-speed-badge { bottom: 2.5rem; }
+}
+@media (max-width: 1024px) {
+  #ui-container .game-container { padding: 0 0 5rem; }
+  #ui-container .tab-container { justify-content: flex-start; }
+  #ui-container .l-antimatter-dim-tab { justify-content: flex-start; }
+  #ui-container .l-dimensions-container { padding: .5rem 0; margin-top: 1rem; }
+  #ui-container .modes-container { margin-bottom: 0; }
+  #ui-container .l-dimension-row-antimatter-dim { margin-top: 0; }
+  #ui-container .resets-container { height: auto; }
+  #ui-container .l-infinity-upgrade-grid { flex-wrap: wrap; justify-content: center; width: 100%; }
+  #ui-container .c-infinity-upgrade-grid__column { flex: 0 1 50%; min-width: 0; padding: 0 .3rem; }
+  #ui-container .l-infinity-upgrade-grid__cell { margin: .5rem 0; width: 100%; height: auto; min-height: 12rem; font-size: 1.2rem; }
+  #ui-container .l-infinity-upgrades-bottom-row, #ui-container .l-eternity-upgrades-grid__row { flex-wrap: wrap; justify-content: center; width: 100%; }
+  #ui-container .l-eternity-upgrades-grid__cell { flex: 1 1 45%; margin: .4rem; min-width: 0; width: auto; }
+  #ui-container .l-eternity-upgrades-grid__cell button { width: 100%; height: auto; min-height: 12rem; }
+}
+@media (max-width: 1024px) {
+  #ui-container .c-prestige-info-blocks { display: flex; flex-wrap: wrap; height: auto; gap: .8rem; align-items: center; justify-content: center; }
+  #ui-container .c-prestige-info-blocks > * { position: static; width: auto; max-width: 100%; flex: 1 1 20rem; }
+  #ui-container .l-game-header__center { order: -1; flex: 1 0 100%; }
+}
+@media (max-width: 1024px) {
+  body { margin: 0; }
+  #ui-container .videocontainer { left: 0; }
+  #ui-container .l-multiplier-subtab-btn-container { flex-wrap: wrap; width: 100%; height: auto; }
+  #ui-container .c-multiplier-subtab-btn { flex: 1 1 8rem; margin: .2rem; }
+  #ui-container .c-achievements-tab__header { width: 100%; }
+  #ui-container .l-achievement-grid, #ui-container .l-achievement-grid__row { width: 100%; }
+  #ui-container .l-achievement-grid__row { flex-wrap: wrap; justify-content: center; }
+  #ui-container .l-achievement-grid__cell { flex: 0 0 calc(25% - .6rem); margin: .3rem; width: auto; max-width: 8rem; height: 7rem; }
+  #ui-container .c-autobuyer-box-row { display: flex; flex-wrap: wrap; width: 100%; max-width: 100%; height: auto; gap: .5rem; padding: 1rem .5rem; }
+  #ui-container .c-autobuyer-box-row > * { position: static; flex: 1 1 12rem; min-width: 0; max-width: 100%; height: auto; }
+  #ui-container .l-autobuyer-box__header { width: 100%; flex-basis: 100%; }
+  #ui-container .l-replicanti-upgrade-row, #ui-container .l-eternity-milestone-grid__row, #ui-container .l-dilation-upgrades-grid__row { flex-wrap: wrap; width: 100%; justify-content: center; }
+  #ui-container .l-replicanti-upgrade-button, #ui-container .l-eternity-milestone-grid__cell, #ui-container .l-dilation-upgrades-grid__cell { flex: 1 1 14rem; width: auto; min-width: 0; max-width: 100%; margin: .4rem; }
+  #ui-container .l-replicanti-upgrade-button button, #ui-container .l-dilation-upgrades-grid__cell button { width: 100%; }
+  #ui-container .l-dilation-upgrades-grid { width: 100%; }
+  #ui-container .l-reality-button-column, #ui-container .c-glyph-peek { width: 100%; max-width: 100%; }
+  #ui-container .l-reality-button-group { width: 100%; }
+  #ui-container .c-black-hole-canvas { width: 100%; max-width: 40rem; height: auto; }
+  #ui-container .l-black-hole-upgrade-grid, #ui-container .l-black-hole-upgrade-grid__row, #ui-container .l-enslaved-shop-container { flex-wrap: wrap; width: 100%; justify-content: center; }
+  #ui-container .c-alchemy-resource-info { width: 100%; height: auto; min-height: 12rem; }
+  #ui-container .l-automator-controls, #ui-container .c-button-group { flex-wrap: wrap; height: auto; max-width: 100%; }
+}
+@media (max-width: 1024px) {
+  .videocontainer { left: 0; }
+  #ui-container .c-list-container, #ui-container .c-multiplier-tab-text-line { width: 100%; }
+  #ui-container .c-multiplier-entry-container { max-width: 100%; }
+  #ui-container .c-stacked-bars { max-width: 100%; }
+  #ui-container .l-reality-glyphs, #ui-container .l-glyphs-container { flex-wrap: wrap; width: 100%; }
+  #ui-container .l-player-glyphs-column, #ui-container .l-glyph-info-wrapper { width: 100%; max-width: 100%; min-width: 0; }
+  #ui-container .l-equipped-glyphs-and-effects-container { flex-wrap: wrap; width: 100%; }
+  #ui-container .l-glyph-inventory { width: 100%; }
+  #ui-container .l-glyph-inventory__row { width: 100%; }
+  #ui-container .l-glyph-inventory__slot { width: 10%; height: auto; aspect-ratio: 1; margin: 0; }
+  #ui-container .l-glyph-inventory__slot .l-glyph-component { max-width: 100%; max-height: 100%; }
+  #ui-container .l-achievement-grid__row > .o-achievement { min-width: 0; }
+}
+@media (max-width: 1024px) {
+  #ui-container .l-mechanics-container, #ui-container .l-effarig-shop-and-run, #ui-container .l-enslaved-celestial-tab--inner, #ui-container .l-enslaved-top-container, #ui-container .l-laitela-mechanics-container { display: flex; flex-wrap: wrap; justify-content: center; width: 100%; gap: 1rem; }
+  #ui-container .l-teresa-mechanic-container, #ui-container .l-effarig-shop, #ui-container .l-effarig-run, #ui-container .l-enslaved-upgrades-column, #ui-container .l-enslaved-run-container, #ui-container .l-enslaved-top-container__half, #ui-container .l-ra-all-pets-container, #ui-container .l-ra-pet-container, #ui-container .c-laitela-singularity-container { width: 100%; min-width: 0; max-width: 100%; margin: .5rem 0; }
+  #ui-container .l-pelle-panel-container { width: calc(100% - 1rem); margin: .5rem; padding: .7rem; }
+  #ui-container .l-pelle-content-container, #ui-container .c-pelle-bar-container { width: 100%; flex-wrap: wrap; justify-content: center; }
+  #ui-container .l-celestial-navigation { width: 100%; height: 70dvh; overflow: hidden; border: 1px solid var(--color-accent); }
+}
+@media (max-width: 1024px) {
+  #ui-container .yc-mobile-title { text-align: center; }
+  #ui-container .yc-mobile-title strong { display: block; font-size: 1.3rem; }
+  #ui-container .yc-mobile-title small { display: block; font-size: .95rem; opacity: .8; }
+  #ui-container .l-autobuyers-tab, #ui-container .l-autobuyer-singlet-group, #ui-container .l-autobuyer-box__footer { width: 100%; max-width: 100%; min-width: 0; }
+  #ui-container .l-autobuyer-box__footer { flex-basis: 100%; padding: .5rem; }
+  #ui-container .l-glyphs-tab { display: flex; flex-direction: column; width: 100%; }
+  #ui-container .l-equipped-glyphs, #ui-container .l-equipped-glyphs__slots, #ui-container .l-equipped-glyphs__buttons, #ui-container .c-current-glyph-effects { width: 100%; max-width: 100%; }
+  #ui-container .l-equipped-glyphs__buttons { display: flex; flex-wrap: wrap; gap: .5rem; }
+  #ui-container .l-glyph-equip-button { flex: 1 1 12rem; width: auto; }
+  #ui-container .c-automator__controls { flex-wrap: wrap; }
+  #ui-container .c-teresa-unlock, #ui-container .c-effarig-shop-button, #ui-container .o-laitela-run-button { max-width: 100%; width: 100%; min-width: 0; height: auto; min-height: 8rem; }
+  #ui-container .l-ra-pet-container { padding: 1rem; }
+  #ui-container .l-ra-unlock { width: 100%; position: static; height: auto; min-height: 8rem; }
+  #ui-container .c-pelle-single-bar { width: 100%; }
+}
+@media (max-width: 1024px) {
+  #ui-container .l-automator-button-row { display: flex; flex-wrap: wrap; height: auto; gap: .3rem; width: 100%; }
+  #ui-container .l-automator__script-names { min-width: 0; width: 100%; }
+  #ui-container .c-teresa-unlock { margin: .5rem 0; }
+  #ui-container .c-effarig-relic-description, #ui-container .pelle-unlock-requirements { width: 100%; }
+  #ui-container .c-dark-matter-dimension-container { display: flex; flex-wrap: wrap; width: 100%; gap: .7rem; height: auto; padding: 1rem 0; }
+  #ui-container .c-dark-matter-dimension-container > * { max-width: 100%; min-width: 0; }
+  #ui-container .c-pelle-rift-row { flex-direction: column; gap: 1rem; padding: 1rem 0; }
+  #ui-container .c-pelle-rift-column { width: 100%; max-width: 100%; }
+  #ui-container .c-pelle-rift-rift-info-container { height: auto; min-height: 5rem; }
+  #ui-container .o-achievement__tooltip { position: fixed; left: 1rem; right: 1rem; top: 12rem; bottom: auto; transform: none; width: calc(100vw - 2rem); z-index: 35; }
+  #ui-container .c-ra-pet-upgrade__tooltip { position: fixed; left: 1rem; right: 1rem; top: 12rem; bottom: auto; transform: none; width: calc(100vw - 2rem); z-index: 35; }
+}
+
+@media (max-width: 1024px) {
+  #ui-container .c-dark-matter-dimension-container { flex-direction: column; align-items: stretch; }
+  #ui-container .c-dark-matter-dimension-buttons { flex-wrap: wrap; gap: .5rem; height: auto; width: 100%; }
+  #ui-container .o-dark-matter-dimension-button { flex: 1 1 10rem; min-width: 0; height: auto; min-height: 5rem; margin: 0; }
+  #ui-container .c-armageddon-container { flex-wrap: wrap; width: 100%; gap: 1rem; }
+  #ui-container .c-armageddon-button-container, #ui-container .c-armageddon-resources-container { width: 100%; min-width: 0; }
+}
+
+.yc-header-toggle { display: none; }
+@media (max-width: 1024px) {
+  #ui-container .game-container { margin-top: 0 !important; }
+  #ui-container .yc-header-toggle { display: inline-block; min-height: 4.4rem; margin: .5rem; padding: .7rem 1rem; }
+  #ui-container .c-prestige-info-blocks { gap: .5rem; margin: .8rem 0; }
+  #ui-container .c-prestige-info-blocks > .yc-header-toggle { order: 1; flex: 0 1 auto; }
+  #ui-container .c-prestige-info-blocks:not(.yc-header-expanded) > .l-game-header__eternity,
+  #ui-container .c-prestige-info-blocks:not(.yc-header-expanded) > .l-game-header__infinity { display: none; }
+  #ui-container .c-prestige-info-blocks > .l-game-header__eternity,
+  #ui-container .c-prestige-info-blocks > .l-game-header__infinity { order: 2; }
+  #ui-container .c-black-hole-header:not(.yc-blackhole-expanded) .yc-blackhole-controls { display: none; }
+  #ui-container .c-reality-container { margin: .7rem 0; }
+  #ui-container .l-reality-button, #ui-container .l-armageddon-button--header { height: auto; min-height: 5.5rem; margin: .5rem 0; padding: .7rem; }
+  #ui-container .c-prestige-button-container { margin: 0; }
+  #ui-container .l-game-header__antimatter-container { margin: 1rem 0; }
+  #ui-container .information-header { margin: .5rem 0; }
+  #ui-container .l-tickspeed-container { height: auto; min-height: 0; padding: .5rem 0; margin: 0; }
+}
+
+@media (max-width: 1024px) {
+  #ui { scrollbar-gutter: auto; }
+  #ui-container .l-laitela-mechanics-container > div { width: 100% !important; max-width: 100%; min-width: 0; }
+  #ui-container .l-tickspeed-container--hidden { display: none; }
+}
+
+@media (max-width: 1024px) {
+  :root { --font-chinese: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif; }
+  #ui-container .l-antimatter-dim-tab__header { flex-wrap: wrap; width: 100%; gap: .5rem; }
+  #ui-container .l-antimatter-dim-tab__header > * { flex: 1 1 12rem; min-width: 0; }
+  #ui-container .l-laitela-annihilation-container, #ui-container .l-laitela-annihilation-button, #ui-container .c-ra-pet-header { width: 100%; max-width: 100%; height: auto; min-height: 4.4rem; }
+  #ui-container .l-laitela-annihilation-container { min-height: 20rem; }
+  #ui-container .c-teresa-shop { width: 100%; min-width: 0; margin: 0; }
+  #ui-container .c-rm-store { width: 10rem; margin-left: 1rem; }
+  #ui-container .c-stacked-bars > div { overflow: hidden; }
+  #ui-container .yc-alchemy-viewport { width: 100%; max-height: 75dvh; overflow: auto; overscroll-behavior: contain; border: 1px solid var(--color-accent); }
+}
+@media (max-width: 1024px) {
+  #ui-container .c-symbol-overlay { font-size: 20rem; overflow: hidden; }
+}
+
+.yc-perk-details, .yc-perk-zoom { display: none; }
+@media (max-width: 1024px) {
+  #ui-container .yc-perk-details { display: block; position: relative; width: 100%; padding: 1rem; border: 1px solid var(--color-accent); background: var(--color-base); line-height: 1.6; z-index: 2; }
+  #ui-container .yc-perk-zoom { display: inline-block; }
+  #ui-container .c-perk-tab { height: auto; min-height: 0; display: flex; flex-direction: column; }
+  #ui-container .c-perk-tab__header { position: static; width: 100%; }
+  #ui-container .c-perk-network { position: relative; height: 65dvh; min-height: 35rem; touch-action: none; }
+  #ui-container .c-button-physics, #ui-container .c-button-perk-layout { max-width: 100%; height: auto; min-height: 4.4rem; }
+}
+
+@media (max-width: 1024px) {
+  #ui-container .o-achievement__tooltip, #ui-container .c-ra-pet-upgrade__tooltip { box-sizing: border-box; max-height: calc(100dvh - 14rem); overflow-y: auto; }
+}
+
+@media (max-width: 1024px) {
+  #ui-container .o-achievement__tooltip, #ui-container .c-ra-pet-upgrade__tooltip { margin: 0; }
+}
+
+@media (max-width: 1024px) {
+  #ui-container .l-glyph-sidebar-option-container { height: auto; }
+  #ui-container .l-glyph-sidebar-tab-container { height: auto; min-height: 5rem; flex-wrap: wrap; }
+  #ui-container .l-glyph-sidebar-button { flex: 1 1 12rem; min-height: 4.4rem; margin: .3rem; }
+  #ui-container .l-reality-button-column { margin-right: 0; }
+}
+
+@media (max-width: 1024px) {
+  #ui-container .c-antimatter-prestige-row .o-primary-btn { font-size: 1.3rem; line-height: 1.4; min-height: 5.6rem; height: auto; padding: .7rem; white-space: normal; }
+}

@@ -1,3 +1,5 @@
+import YCConsoleModal from "../components/modals/YCConsoleModal.js";
+import YCExportModal from "../components/modals/YCExportModal.js";
 import { ProgressChecker } from "./storage/progress-checker.js";
 
 import EternityChallengeStartModal from "../components/modals/challenges/EternityChallengeStartModal.js";
@@ -340,3 +342,6 @@ Modal.message = new class extends Modal {
     Modal.hide();
   }
 }(MessageModal, 2);
+
+Modal.ycConsole = new Modal(YCConsoleModal);
+Modal.ycExport = new Modal(YCExportModal);

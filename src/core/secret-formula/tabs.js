@@ -362,7 +362,7 @@ export const tabs = [
       },
       {
         key: "imag_upgrades",
-        name: "虚幻升级",
+        name: "虚数升级",
         symbol: "<i class='fas fa-level-up-alt'></i>",
         component: "ImaginaryUpgradesTab",
         condition: () => MachineHandler.isIMUnlocked,
@@ -371,7 +371,7 @@ export const tabs = [
       },
       {
         key: "perks",
-        name: "复兴树",
+        name: "特权树",
         symbol: "<i class='fas fa-project-diagram'></i>",
         component: "PerksTab",
         id: 3,

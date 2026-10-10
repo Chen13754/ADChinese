@@ -333,15 +333,15 @@ export const alchemyResources = {
   "uncountability": {
     key: "uncountability",
     id: ALCHEMY_RESOURCE.UNCOUNTABILITY,
-    name: "无尽奥秘",
+    name: "不可数性",
     symbol: "Θ",
     isBaseResource: false,
     effect: amount => 160 * Math.sqrt(amount / 25000),
     tier: 4,
     uiOrder: 3,
     unlockedAt: 19,
-    description: "自动获得现实次数和复兴点数",
-    formatEffect: value => `每秒获得 ${format(value, 2, 2)} 现实次数和复兴点数`,
+    description: "自动获得现实次数和特权点",
+    formatEffect: value => `每秒获得 ${format(value, 2, 2)} 现实次数和特权点`,
     reagents: [
       {
         resource: ALCHEMY_RESOURCE.INFINITY,
@@ -442,7 +442,7 @@ export const alchemyResources = {
     effect: amount => Math.floor(amount),
     tier: 5,
     unlockedAt: 25,
-    description: "can be consumed to create Reality Glyphs",
+    description: "可消耗以创造现实符文",
     formatEffect: value => `消耗所有的炼金资源“现实”，创造一个等级为 ${formatInt(value)} 的现实符文`,
     reagents: [
       {

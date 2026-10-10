@@ -88,7 +88,7 @@ export const TD = {
     icon: MultiplierTabIcons.SACRIFICE("time"),
   },
   powPurchase: {
-    name: "虚幻升级——入侵之忆",
+    name: "虚数升级——入侵之忆",
     powValue: () => ImaginaryUpgrade(14).effectOrDefault(1),
     isActive: () => ImaginaryUpgrade(14).canBeApplied,
     icon: MultiplierTabIcons.UPGRADE("imaginary"),
@@ -231,7 +231,7 @@ export const TD = {
     icon: MultiplierTabIcons.ALCHEMY,
   },
   imaginaryUpgrade: {
-    name: "虚幻升级——干涉之嫌",
+    name: "虚数升级——干涉之嫌",
     powValue: () => ImaginaryUpgrade(11).effectOrDefault(1),
     isActive: () => ImaginaryUpgrade(11).canBeApplied,
     icon: MultiplierTabIcons.UPGRADE("imaginary"),

@@ -8,6 +8,11 @@ export default {
   components: {
     PerkPointLabel
   },
+  data() { return { ycPerk: null }; },
+  methods: {
+    update() { const p = Perks.find(PerkNetwork.selectedId); this.ycPerk = p ? { id: p.id, label: p.label, description: p.config.description, bought: p.isBought, available: p.canBeBought } : null; },
+    buySelected() { Perks.find(this.ycPerk.id).purchase(); PerkNetwork.updatePerkColor(); PerkNetwork.updatePerkSize(); GameUI.update(); },
+  },
   computed: {
     showHintText() {
       return ui.view.shiftDown || player.options.showHintText.perks;
@@ -39,6 +44,10 @@ export default {
     class="c-perk-tab"
   >
     <PerkPointLabel />
+    <section class="yc-perk-details">
+      <template v-if="ycPerk"><strong>{{ ycPerk.label }}</strong><p>{{ ycPerk.description }}</p><button class="o-primary-btn" :disabled="ycPerk.bought || !ycPerk.available" @click="buySelected">{{ ycPerk.bought ? '已购买' : '购买（1 特权点）' }}</button></template>
+      <p v-else>点击节点查看说明，再选择购买；在树图区域拖动或缩放。</p>
+    </section>
   </div>
   `
 };
@@ -139,6 +148,7 @@ export const PerkLayouts = [
 ];
 
 export const PerkNetwork = {
+  selectedId: null,
   container: undefined,
   network: undefined,
   nodes: undefined,
@@ -158,6 +168,7 @@ export const PerkNetwork = {
     this.network.on("click", params => {
       const id = params.nodes[0];
       if (!isFinite(id)) return;
+      if (window.innerWidth <= 1024) { this.selectedId = id; GameUI.update(); return; }
       Perks.find(id).purchase();
       this.updatePerkColor();
       this.updatePerkSize();

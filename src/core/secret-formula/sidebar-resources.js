@@ -83,7 +83,7 @@ export const sidebarResources = [
   },
   {
     id: 11,
-    optionName: "虚幻机器",
+    optionName: "虚数机器",
     isAvailable: () => MachineHandler.isIMUnlocked,
     value: () => new Decimal(Currency.imaginaryMachines.value),
     formatValue: x => format(x, 2),

@@ -106,7 +106,7 @@ export const ID = {
     icon: MultiplierTabIcons.SACRIFICE("infinity"),
   },
   powPurchase: {
-    name: "虚幻升级——入侵之忆",
+    name: "虚数升级——入侵之忆",
     powValue: () => ImaginaryUpgrade(14).effectOrDefault(1),
     isActive: () => ImaginaryUpgrade(14).canBeApplied,
     icon: MultiplierTabIcons.UPGRADE("imaginary"),
@@ -241,7 +241,7 @@ export const ID = {
     icon: MultiplierTabIcons.ALCHEMY,
   },
   imaginaryUpgrade: {
-    name: "虚幻升级——无边双曲",
+    name: "虚数升级——无边双曲",
     multValue: dim => Decimal.pow(ImaginaryUpgrade(8).effectOrDefault(1),
       dim ? 1 : MultiplierTabHelper.activeDimCount("ID")),
     isActive: () => ImaginaryUpgrade(8).canBeApplied,

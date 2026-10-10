@@ -36,7 +36,7 @@ export default {
       };
     },
     questionmarkTooltip() {
-      return "The score of a Glyph is its rarity percentage, plus the specified amount for each effect it has.";
+      return "符文评分等于稀有度百分比，加上其每个效果所指定的分值。";
     },
     // This is an absolute value limit (ie. it's allowed to go negative down to negative this value)
     weightInputLimit() {

@@ -72,7 +72,7 @@ export const changelog = [
 <b>主要更新：</b><br>
 <ul>
 <li>在鸣谢名单中添加新加入的 Android 测试人员</li>
-<li>新增一项复兴节点</li>
+<li>新增一项特权节点</li>
 </ul>
 <br>
 <b>新增便利性功能与信息：</b><br>
@@ -100,7 +100,7 @@ export const changelog = [
 <br>
 <b>次要界面调整：</b><br>
 <ul>
-<li>为新 DAB 复兴节点调整复兴布局</li>
+<li>为新 DAB 特权节点调整复兴布局</li>
 <li>确保符文展示弹窗中的排序顺序一致</li>
 <li>新增浅色/深色符文稀有度色盲调色板</li>
 <li>修复若干细微界面显示问题</li>
@@ -148,7 +148,7 @@ export const changelog = [
 <li>为大灾变场景添加膨胀和符文重置快捷键</li>
 <li>Shift+点击现实按钮现在强制显示符文选择弹窗（无视设置）</li>
 <li>新增 3 种复兴布局（方形/水平网格/距起始点距离）</li>
-<li>可为部分现实/虚幻升级启用"升级锁定"，自动阻止不符合解锁条件的手动/自动操作</li>
+<li>可为部分现实/虚数升级启用"升级锁定"，自动阻止不符合解锁条件的手动/自动操作</li>
 <li>符文筛选设置现在支持文本导入导出</li>
 <li>当筛选器不接受任何待选符文时，可设置为立即执行现实（自动购买器开启且条件满足时）</li>
 <li>将空间之理（当前/总量）添加为自动机货币</li>
@@ -166,7 +166,7 @@ export const changelog = [
 <li>前几次现实中的资源追赶弹窗显示更详细</li>
 <li>受 EU2 复兴影响的升级现显示更准确的价格文本</li>
 <li>修复未选择符文时意外执行现实的漏洞（禁用选择弹窗后仍会随机选择）</li>
-<li>现实重置记录现适时显示虚幻机器</li>
+<li>现实重置记录现适时显示虚数机器</li>
 <li>更新澄清多项游戏指南条目</li>
 <li>重置记录标签页新增更多显示选项</li>
 <li>若干文本微调</li>
@@ -640,7 +640,7 @@ Wording and Layout Changes:
   (red), around same (white), or more (green) IP/EP than you currently have.</li>
 <li>Moved study 33 to right side.</li>
 <li>Changed "Normal Dimensions" to "Antimatter Dimensions".</li>
-<li>Changed "Challenges" to "Normal Challenges".</li>
+<li>Changed "Challenges" to "普通挑战".</li>
 <li>Fixed some tpyos.</li>
 </ul>
 <br>

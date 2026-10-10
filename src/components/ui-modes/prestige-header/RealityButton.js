@@ -36,7 +36,7 @@ export default {
         return `（预计获得 ${format(this.projectedRM, 2)} 现实机器）`;
       }
       if (this.newIMCap !== 0) {
-        return `（虚幻机器上限：${formatMachines(0, this.newIMCap)}）`;
+        return `（虚数机器上限：${formatMachines(0, this.newIMCap)}）`;
       }
       if (this.machinesGained.lt(Number.MAX_VALUE)) {
         return `（${format(this.machinesGained.divide(this.realityTime), 2, 2)} 现实机器/分钟）`;
@@ -161,11 +161,11 @@ export default {
           class="infotooltiptext"
         >
           <div>获得的其他资源</div>
-          <div>{{ formatInt(ppGained) }} 复兴点数</div>
+          <div>{{ formatInt(ppGained) }} 特权点</div>
           <div v-if="shardsGained !== 0">
             {{ shardsGainedText }} （{{ format(currentShardsRate, 2) }}/分钟）
             <br>
-            在 {{ format(bestShardRateVal, 2) }} 遗迹碎片时达到峰值：{{ format(bestShardRate, 2) }}/分钟 
+            在 {{ format(bestShardRateVal, 2) }} 遗迹碎片时达到峰值：{{ format(bestShardRate, 2) }}/分钟
           </div>
           <div
             v-for="(celestialInfo, i) in celestialRunText"

@@ -310,7 +310,7 @@ export default {
         :style="rowStyle('perk shop')"
         class="l-glyph-levels-and-weights__factor"
       >
-        复兴点商店
+        特权点商店
       </div>
       <div
         :style="rowStyle('perk shop')"

@@ -120,7 +120,7 @@ export default {
       <ModalOptionsToggleButton
         v-if="realityUnlocked"
         v-model="perks"
-        text="复兴节点名称："
+        text="特权节点名称："
       />
       <ModalOptionsToggleButton
         v-if="alchemyUnlocked"

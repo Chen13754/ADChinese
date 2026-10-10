@@ -174,6 +174,10 @@ export default {
     :class="classObject"
     :style="styleObject"
     @mouseenter="onMouseEnter"
+    @click="onMouseEnter"
+    tabindex="0"
+    @focus="onMouseEnter"
+    @blur="onMouseLeave"
     @mouseleave="onMouseLeave"
     data-v-normal-achievement
   >

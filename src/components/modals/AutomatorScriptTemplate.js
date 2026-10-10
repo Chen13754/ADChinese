@@ -15,6 +15,10 @@ export default {
       type: String,
       required: true,
     },
+    displayName: {
+      type: String,
+      required: true,
+    },
     description: {
       type: String,
       required: true,
@@ -123,7 +127,7 @@ export default {
     copyAndClose() {
       if (this.isBlock) {
         const newTemplateBlock = {
-          name: `模板：${this.name}`,
+          name: `模板：${this.displayName}`,
           blocks: blockifyTextAutomator(this.templateScript.script).blocks
         };
         AutomatorData.blockTemplates.push(newTemplateBlock);
@@ -138,7 +142,7 @@ export default {
   template: `
   <ModalWrapper class="c-automator-template-container">
     <template #header>
-      {{ name }} 模板
+      {{ displayName }} 模板
     </template>
     <div class="c-automator-template-description">
       {{ description }}
@@ -191,7 +195,7 @@ export default {
       </div>
     </div>
     <div class="c-automator-template-warnings">
-      <b>Possible things to consider:</b>
+      <b>使用前请留意：</b>
       <div v-if="validWarnings.length !== 0">
         <div
           v-for="warning in validWarnings"

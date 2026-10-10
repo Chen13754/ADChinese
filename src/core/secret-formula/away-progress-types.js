@@ -136,7 +136,7 @@ export const awayProgressTypes = [
     showOption: false,
   }, {
     name: "imaginaryMachines",
-    forcedName: "虚幻机器",
+    forcedName: "虚数机器",
     reference: ["reality", "imaginaryMachines"],
     isUnlocked: () => MachineHandler.isIMUnlocked,
   }, {

@@ -17,8 +17,12 @@ export default {
   },
   mounted() {
     this.updatePositionStyles();
+    window.visualViewport?.addEventListener("resize", this.updatePositionStyles);
+    window.visualViewport?.addEventListener("scroll", this.updatePositionStyles);
   },
   destroyed() {
+    window.visualViewport?.removeEventListener("resize", this.updatePositionStyles);
+    window.visualViewport?.removeEventListener("scroll", this.updatePositionStyles);
     document.activeElement.blur();
   },
   methods: {
@@ -33,6 +37,11 @@ export default {
     },
     updatePositionStyles() {
       if (!this.$refs.modal) return;
+      const viewport = window.visualViewport;
+      if (this.showModal && innerWidth <= 1024 && viewport) {
+        this.positionStyle = { left: `${viewport.offsetLeft + viewport.width / 2}px`, top: `${viewport.offsetTop + viewport.height / 2}px`, maxHeight: `${viewport.height - 20}px`, transform: "translate(-50%, -50%)" };
+        return;
+      }
       if (!this.showModal || this.$viewModel.theme !== "S12") {
         this.positionStyle = {};
         return;

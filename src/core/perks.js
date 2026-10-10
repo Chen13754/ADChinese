@@ -85,8 +85,8 @@ export function checkPerkValidity() {
   dev.respecPerks();
   if (Currency.perkPoints.gte(Perks.all.length)) {
     dev.buyAllPerks();
-    Modal.message.show("部分复兴节点无效，但已自动购买所有有效复兴节点。");
+    Modal.message.show("部分特权节点无效，但已自动购买所有有效特权节点。");
   } else {
-    Modal.message.show("部分复兴节点无效，因此已重置你的复兴节点并退还复兴点数。");
+    Modal.message.show("部分特权节点无效，因此已重置你的特权节点并退还特权点。");
   }
 }

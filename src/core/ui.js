@@ -1,5 +1,4 @@
 import VTooltip from "../../modules/v-tooltip.js";
-import VueGtag from "../../modules/vue-gtag.js";
 
 import { DEV } from "../env.js";
 
@@ -184,9 +183,7 @@ Vue.use(VTooltip);
 
 useLongPress(Vue);
 useRepeatingClick(Vue);
-Vue.use(VueGtag, {
-  config: { id: "UA-77268961-1" }
-});
+
 
 export const ui = new Vue({
   el: "#ui",

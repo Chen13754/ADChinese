@@ -231,7 +231,7 @@ export default {
       }
 
       // We want to handle very small numbers carefully to distinguish between "disabled/inactive" and
-      // "too small to be relevant"
+      // "数值过小，可忽略"
       let percString;
       if (percents === 0) percString = formatPercents(0);
       else if (percents === 1) percString = formatPercents(1);

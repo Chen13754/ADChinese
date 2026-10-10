@@ -13,16 +13,16 @@ export default {
     ModalWrapperChoice,
     PrimaryButton
   },
+  props: { initialInput: { type: String, default: "" } },
   data() {
     return {
-      input: "",
+      input: this.initialInput,
       offlineImport: OFFLINE_PROGRESS_TYPE.IMPORTED,
     };
   },
   computed: {
     saveCheckString() {
-      const save = GameSaveSerializer.deserialize(this.input);
-      const rawString = GameStorage.checkPlayerObject(save);
+      const rawString = GameStorage.checkImport(this.input);
       // Keep the length bounded; we don't want the modal to be too big for the screen for particularly bad errors
       return rawString.length > 300 ? `${rawString.slice(0, 297)}...` : rawString;
     },
@@ -33,7 +33,7 @@ export default {
       return PlayerProgress.of(this.player);
     },
     fileName() {
-      return this.player.options.saveFileName;
+      return this.player.options?.saveFileName;
     },
     antimatter() {
       return this.player.antimatter || this.player.money;
@@ -60,6 +60,7 @@ export default {
       return this.player.lastUpdate > Date.now();
     },
     lastOpened() {
+      if (this.player.lastUpdate === undefined) return "此旧版存档未记录上次打开的时间。";
       const ms = Date.now() - this.player.lastUpdate;
       return this.isFromFuture
         ? `这个存档来自 ${TimeSpan.fromMilliseconds(-ms).toString()} 后的未来。`
@@ -88,6 +89,7 @@ export default {
       if (!GameStorage.offlineEnabled) return "当前设置使存档导入后不计算离线进度";
       if (this.isFromFuture) return "由于时间的误差，导入后不计算离线进度";
 
+      if (this.player.lastUpdate === undefined) return "旧版存档的离线进度将按原生迁移规则处理";
       const durationInMs = Date.now() - this.player.lastUpdate;
       const ticks = GameStorage.maxOfflineTicks(durationInMs);
       return `导入后将计算 ${formatInt(ticks)} 个时间间隔为
@@ -95,7 +97,7 @@ export default {
     },
     willLoseCosmetics() {
       const currSets = player.reality.glyphs.cosmetics.unlockedFromNG;
-      const importedSets = this.player.reality?.glyphs.cosmetics?.unlockedFromNG ?? [];
+      const importedSets = this.player.reality?.glyphs?.cosmetics?.unlockedFromNG ?? [];
       return currSets.filter(set => !importedSets.includes(set)).length > 0;
     },
     willLoseSpeedrun() {
@@ -119,8 +121,8 @@ export default {
       switch (this.offlineImport) {
         case OFFLINE_PROGRESS_TYPE.IMPORTED:
           // These are default values from a new save, used if importing from pre-reality where these props don't exist
-          GameStorage.offlineEnabled = this.player.options.offlineProgress ?? true;
-          GameStorage.offlineTicks = this.player.options.offlineTicks ?? 1e5;
+          GameStorage.offlineEnabled = this.player.options?.offlineProgress ?? true;
+          GameStorage.offlineTicks = this.player.options?.offlineTicks ?? 1e5;
           break;
         case OFFLINE_PROGRESS_TYPE.LOCAL:
           GameStorage.offlineEnabled = player.options.offlineProgress;
@@ -139,7 +141,7 @@ export default {
   },
   template: `
   <ModalWrapperChoice
-    :show-cancel="!inputIsValid"
+    :show-cancel="true"
     :show-confirm="false"
   >
     <template #header>
@@ -175,7 +177,7 @@ export default {
           通关次数：{{ formatInt(player.records.fullGameCompletions) }}
         </div>
         <div class="c-modal-import__warning">
-          这将覆盖你当前的游戏进度！
+          这将覆盖当前存档槽的进度，并恢复正常速度。其它存档槽保留。
         </div>
         <br>
         <div>
@@ -216,7 +218,7 @@ export default {
       class="o-primary-btn--width-medium c-modal-message__okay-btn c-modal__confirm-btn"
       @click="importSave"
     >
-      导入
+      确认覆盖并导入
     </PrimaryButton>
   </ModalWrapperChoice>
   `

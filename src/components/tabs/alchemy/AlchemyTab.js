@@ -172,7 +172,7 @@ export default {
       };
     },
     showAlchemyHowTo() {
-      ui.view.h2pForcedTab = GameDatabase.h2p.tabs.filter(tab => tab.name === "Glyph Alchemy")[0];
+      ui.view.h2pForcedTab = GameDatabase.h2p.tabs.filter(tab => tab.name === "符文炼金资源")[0];
       Modal.h2p.show();
     },
     toggleAllReactions() {
@@ -223,6 +223,7 @@ export default {
     <span v-if="reactionsAvailable">
       每进行一次现实，发生一次反应，不受利用储存的现实时间进行现实扩增的影响。
     </span>
+    <div class="yc-alchemy-viewport" aria-label="炼金图，可在区域内滚动">
     <div
       class="l-alchemy-circle"
       :style="circleStyle"
@@ -269,6 +270,7 @@ export default {
           :class="reactionArrowClass(reactionArrow)"
         />
       </svg>
+    </div>
     </div>
   </div>
   `

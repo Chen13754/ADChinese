@@ -43,18 +43,14 @@ export default {
       v-if="onInfoPage"
       class="c-modal-message__text"
     >
-      This will start a save with additional statistics tracking for when you reach certain points of
-      the game. These will be visible in the bottom-right of the screen and on a dedicated subtab of Statistics.
+      速通存档会额外记录到达各进度节点的时间，可在屏幕右下角及统计的专用子页面中查看。
       <br>
       <br>
-      Almost all animations and confirmations are disabled by default, but you can change any of these settings before
-      you reach their required progression. When you begin the run, the game remains paused until
-      your antimatter changes, allowing you to configure all your settings before starting. In order to avoid having
-      to wait for a long time before actually starting an optimized run, a few achievements are given for free.
+      默认关闭大部分动画和确认提示，你可以在解锁相应内容前修改这些设置。速通开始时，游戏会保持暂停，直到反物质发生变化，方便你先配置设置。为免开局优化需要长时间等待，部分成就会直接赠送。
       <br>
       <br>
       <i>
-        There is no additional content in Speedrun Mode.
+        速通模式没有额外的游戏内容。
       </i>
       <br>
       <br>
@@ -62,16 +58,14 @@ export default {
         class="o-primary-btn--width-medium c-modal-hard-reset-btn c-modal__confirm-btn"
         @click="nextPage"
       >
-        Continue
+        继续
       </PrimaryButton>
     </div>
     <div
       v-else
       class="c-modal-message__text"
     >
-      You can type in text below to name your speedrun save. This will have no effects on gameplay and only identifies
-      this particular save as yours. If no name is given, a random name will be generated instead. This name can be
-      changed by clicking your name in the speedrun info box, as long as the timer has not started yet.
+      可在下方为速通存档命名，名称只用于识别，不影响游戏。留空时会随机生成。计时开始前，点击速通信息框中的名字仍可修改。
       <input
         ref="name"
         v-model="name"
@@ -81,19 +75,14 @@ export default {
       >
       <br>
       <br>
-      Speedrun saves can be imported and exported like regular saves. Importing a speedrun save will mark it as a
-      Segmented run, as importing and exporting allows for optimization of individual segments of the game.
-      Without importing, saves will remain as Single-segment runs.
+      速通存档和普通存档一样可以导入导出。由于导入导出允许逐段优化，导入速通存档会将其标记为分段速通；从未导入的存档保持为单段速通。
       <br>
       <br>
-      You can modify the Glyph RNG seed in the Options tab before starting your run, if desired.
+      速通开始前，可在设置中修改符文随机种子。
       <br>
       <br>
       <div class="c-modal-hard-reset-danger">
-        Starting a speedrun will reset your save to the beginning of the game. Some things will remain, such as
-        full-game completion stats, visual settings, automator scripts, and Glyph cosmetics, but otherwise it
-        will be as if you had just finished the entire game and chose to restart at the credits screen. Type
-        in "Gotta Go Fast!" below to confirm and (re)start the run.
+        开始速通会将当前存档槽重置到游戏开端。通关统计、显示设置、自动机脚本和符文皮肤会保留，其他内容相当于通关后重新开始。输入英文确认短语 “Gotta Go Fast!”，以确认开始或重新开始速通。
       </div>
       <input
         ref="confirmPhrase"
@@ -104,10 +93,10 @@ export default {
       >
     </div>
     <template #confirm>
-      Start Run!
+      开始速通！
     </template>
     <template #cancel>
-      Cancel
+      取消
     </template>
   </ModalWrapperChoice>
   `

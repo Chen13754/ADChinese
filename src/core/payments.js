@@ -24,7 +24,7 @@ const Payments = {
         body: JSON.stringify({ amount: STD, cloudID: Cloud.user.id })
       });
     } catch (e) {
-      GameUI.notify.error("Could not contact payment server!", 10000);
+      GameUI.notify.error("无法连接付款服务器！", 10000);
       return;
     }
     const data = await res.json();
@@ -57,7 +57,7 @@ const Payments = {
         statusRes = await fetch(`${STD_BACKEND_URL}/validate?sessionId=${id}`);
       } catch (e) {
         // Note: Not redundant with notification in buyMoreSTD above; will not be reached if exception is thrown there
-        GameUI.notify.error("Could not contact payment server!", 10000);
+        GameUI.notify.error("无法连接付款服务器！", 10000);
         Payments.clearInterval();
         return;
       }
@@ -66,7 +66,7 @@ const Payments = {
       if (completed) {
         Payments.windowReference?.close();
         await ShopPurchaseData.syncSTD();
-        GameUI.notify.success(`Purchase of ${amount} STDs was successful, thank you for your support! ❤️`, 10000);
+        GameUI.notify.success(`已成功购买 ${amount} 个 STD，谢谢你的支持！❤️`, 10000);
         Payments.clearInterval();
         player.IAP.checkoutSession = { id: false };
         GameStorage.save();
@@ -76,7 +76,7 @@ const Payments = {
       if (failure) {
         Payments.windowReference?.close();
         Payments.clearInterval();
-        GameUI.notify.error(`Purchase failed!`, 10000);
+        GameUI.notify.error(`购买失败！`, 10000);
         player.IAP.checkoutSession = { id: false };
         GameStorage.save();
         return;
@@ -109,14 +109,14 @@ const Payments = {
         })
       });
     } catch (e) {
-      GameUI.notify.error("Unable to spend STD coins on upgrade!", 10000);
+      GameUI.notify.error("无法使用 STD 币购买升级！", 10000);
       return false;
     }
     const stdData = await res.json();
     // The "not enough STDs" message should only show up if the player modifies costs on the frontend and forces the
     // game to send a request despite not actually having enough STDs. The cost check is done again on the backend
-    if (stdData.success) GameUI.notify.info(`Successfully spent ${stdData.amountSpent} STD coins`, 10000);
-    else GameUI.notify.error(stdData.error ?? "Unable to purchase upgrade", 10000);
+    if (stdData.success) GameUI.notify.info(`已成功花费 ${stdData.amountSpent} STD 币。`, 10000);
+    else GameUI.notify.error(stdData.error ?? "无法购买升级", 10000);
     ShopPurchaseData.syncSTD(false, stdData.data);
     return stdData.success;
   },
@@ -135,9 +135,9 @@ const Payments = {
         body: JSON.stringify({ sessionId: player.IAP.checkoutSession.id })
       });
     } catch (e) {
-      GameUI.notify.error("Could not contact payment server!", 10000);
+      GameUI.notify.error("无法连接付款服务器！", 10000);
     }
-    if (isTimeout) GameUI.notify.error("Purchase took too long to resolve!", 10000);
+    if (isTimeout) GameUI.notify.error("购买确认超时！", 10000);
     player.IAP.checkoutSession = { id: false };
     GameStorage.save();
     this.hasCanceled = false;

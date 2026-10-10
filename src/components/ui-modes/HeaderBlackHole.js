@@ -12,6 +12,7 @@ export default {
   data() {
     return {
       canModifyBlackHoles: false,
+      ycExpanded: false,
       displaySingle: false,
       singleState: "",
       pauseText: "",
@@ -75,8 +76,11 @@ export default {
   <span
     v-if="canModifyBlackHoles"
     class="c-black-hole-header"
+    :class="{ 'yc-blackhole-expanded': ycExpanded }"
     data-v-header-black-hole
   >
+    <button class="o-primary-btn yc-header-toggle" :aria-expanded="String(ycExpanded)" @click="ycExpanded = !ycExpanded">黑洞与储存 {{ ycExpanded ? '▴' : '▾' }}</button>
+    <span class="yc-blackhole-controls">
     <PrimaryButton
       class="o-primary-btn--buy-max c-primary-btn--black-hole-header"
       onclick="BlackHoles.togglePause()"
@@ -128,6 +132,7 @@ export default {
         label="脉冲："
         data-v-header-black-hole
       />
+    </span>
     </span>
   </span>
   `

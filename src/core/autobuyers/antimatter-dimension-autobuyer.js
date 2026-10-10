@@ -102,7 +102,7 @@ export class AntimatterDimensionAutobuyerState extends UpgradeableAutobuyerState
     const hasAutobuyer = dim.isAvailableForPurchase && dim.isAffordable;
 
     // From IntervaledAutobuyerState.canTick
-    const intervalTick = this.timeSinceLastTick >= this.interval;
+    const intervalTick = YC.time("autobuyers", this.timeSinceLastTick) >= this.interval;
 
     // From AutobuyerState.canTick (ignores this.constructor.isActive because that's accounted for in thisSetting)
     const autoTick = player.auto.autobuyersOn && this.isActive && (this.isUnlocked || this.isBought);

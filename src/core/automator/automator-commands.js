@@ -399,7 +399,7 @@ export const AutomatorCommands = [
           S.commandState = { timeMs: 0 };
           AutomatorData.logCommandEvent(`已开始暂停（等待 ${timeString}）`, ctx.startLine);
         } else {
-          S.commandState.timeMs += Math.max(Time.unscaledDeltaTime.totalMilliseconds, AutomatorBackend.currentInterval);
+          S.commandState.timeMs += Math.max(YC.time("automator", Time.unscaledDeltaTime.totalMilliseconds), AutomatorBackend.currentInterval);
         }
         const finishPause = S.commandState.timeMs >= duration;
         if (finishPause) {

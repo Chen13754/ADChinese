@@ -93,7 +93,7 @@ export class IntervaledAutobuyerState extends AutobuyerState {
   }
 
   get canTick() {
-    return super.canTick && this.timeSinceLastTick >= this.interval;
+    return super.canTick && YC.time("autobuyers", this.timeSinceLastTick) >= this.interval;
   }
 
   get timeSinceLastTick() {

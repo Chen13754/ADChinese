@@ -59,7 +59,7 @@ export default {
         this.clickedGlyphId = id;
         if (!glyph) return;
         if (Glyphs.isMusicGlyph(glyph)) {
-          new Audio(`../../../../public/audio/note${col}.mp3`).play();
+          new Audio(new URL(`../../../../public/audio/note${col}.mp3`, import.meta.url).href).play();
         }
         // Else it's double click, so equip a glyph
       } else if (this.clickedGlyphId === id) {

@@ -6,7 +6,7 @@ export class RealityAutobuyerState extends AutobuyerState {
   }
 
   get name() {
-    return `Reality`;
+    return `现实`;
   }
 
   get isUnlocked() {
@@ -122,7 +122,7 @@ export class RealityAutobuyerState extends AutobuyerState {
         proc = rmProc && glyphProc;
         break;
       case AUTO_REALITY_MODE.TIME:
-        proc = player.records.thisReality.realTime / 1000 > this.time;
+        proc = YC.time("autoPrestige", player.records.thisReality.realTime / 1000) > this.time;
         break;
       case AUTO_REALITY_MODE.RELIC_SHARD:
         proc = Effarig.shardsGained * ampFactor > this.shard;

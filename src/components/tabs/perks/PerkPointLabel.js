@@ -42,6 +42,7 @@ export default {
         "o-primary-btn--disabled": this.physicsOverride !== undefined
       };
     },
+    zoomTree(factor) { const n = PerkNetwork.network; n.moveTo({ scale: Math.clamp(n.getScale() * factor, PerkNetwork.minScale, PerkNetwork.maxScale) }); },
     centerTree() {
       PerkNetwork.resetPosition(true);
     },
@@ -69,11 +70,11 @@ export default {
     class="c-perk-tab__header"
     data-v-perk-point-label
   >
-    你拥有 <span class="c-perk-tab__perk-points" data-v-perk-point-label>{{ format(pp, 2) }}</span> 复兴点数。
+    你拥有 <span class="c-perk-tab__perk-points" data-v-perk-point-label>{{ format(pp, 2) }}</span> 特权点。
     <br>
-    复兴树的选择是永久性的，不能重置。
+    特权树的选择是永久性的，不能重置。
     <br>
-    菱形的复兴节点也会提供自动点数。
+    菱形的特权节点也会提供自动点数。
     <br>
     <div
       class="perk-settings"
@@ -84,7 +85,7 @@ export default {
         @click="cycleLayout"
         data-v-perk-point-label
       >
-        复兴树布局：{{ layoutText }}
+        特权树布局：{{ layoutText }}
       </PrimaryButton>
       <PrimaryButton
         :class="physicsClassObject()"
@@ -99,8 +100,10 @@ export default {
         @click="centerTree"
         data-v-perk-point-label
       >
-        基于 START 居中复兴树
+        基于起点居中特权树
       </PrimaryButton>
+      <button class="o-primary-btn yc-perk-zoom" @click="zoomTree(0.8)">缩小</button>
+      <button class="o-primary-btn yc-perk-zoom" @click="zoomTree(1.25)">放大</button>
       <PrimaryButton
         class="o-primary-btn"
         @click="straightenEdges"

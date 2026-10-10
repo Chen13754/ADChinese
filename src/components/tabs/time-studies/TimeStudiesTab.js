@@ -26,6 +26,7 @@ export default {
   data() {
     return {
       respec: player.respec,
+      ycZoom: 1,
       layoutType: STUDY_TREE_LAYOUT_TYPE.NORMAL,
       vLevel: 0,
       renderedStudyCount: 0,
@@ -152,9 +153,11 @@ export default {
         导入时间研究树
       </PrimaryButton>
     </div>
+    <div class="yc-tree-tools"><label>研究树缩放 <input type="range" min="0.35" max="1.25" step="0.05" v-model.number="ycZoom"></label><button class="o-primary-btn" @click="ycZoom=1">原始大小</button></div>
+    <div class="yc-tree-viewport"><div :style="{ width: (layout.width * ycZoom) + 'rem', height: (layout.height * ycZoom) + 'rem' }">
     <div
+      :style="[treeStyleObject, { transform: 'scale(' + ycZoom + ')', transformOrigin: 'top left' }]"
       class="l-time-study-tree l-time-studies-tab__tree"
-      :style="treeStyleObject"
     >
       <component
         :is="studyComponent(setup.study)"
@@ -184,6 +187,7 @@ export default {
         />
       </svg>
     </div>
+    </div></div>
   </div>
   `
 };

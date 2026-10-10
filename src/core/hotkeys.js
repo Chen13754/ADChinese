@@ -408,7 +408,7 @@ function toggleBuySingles(buyer) {
     GameUI.notify.info("连续统已启用，无法修改此自动购买器。");
   } else if (buyer.isUnlocked && buyer.toggleMode !== null) {
     buyer.toggleMode();
-    const bulkName = (buyer.name === "Tickspeed" || buyer.hasUnlimitedBulk) ? "最大数量" : " 10 个";
+    const bulkName = (buyer === Autobuyer.tickspeed || buyer.hasUnlimitedBulk) ? "最大数量" : " 10 个";
     GameUI.notify.info(`${buyer.name}自动购买器已设为 购买${(buyer.mode === 1) ? "单个" : bulkName}`);
   }
   return false;

@@ -1,0 +1,20 @@
+{
+  "name": "yc-antimatter-dimensions",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node tests/check.cjs",
+    "test": "node tests/browser.cjs",
+    "test:browser": "node tests/browser.cjs",
+    "test:layout": "node tests/survey.cjs",
+    "preview": "node tests/server.cjs",
+    "build": "node tests/package.cjs",
+    "test:timers": "node tests/timers.cjs",
+    "test:interaction": "node tests/interactions.cjs"
+  },
+  "devDependencies": {
+    "acorn": "^8.19.0",
+    "playwright-core": "1.64.0"
+  }
+}

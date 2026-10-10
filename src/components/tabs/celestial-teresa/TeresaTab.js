@@ -80,7 +80,7 @@ export default {
     lastMachinesString() {
       return this.lastMachines.lt(DC.E10000)
         ? `${format(this.lastMachines, 2)} 现实机器`
-        : `${format(this.lastMachines.dividedBy(DC.E10000), 2)} 虚幻机器`;
+        : `${format(this.lastMachines.dividedBy(DC.E10000), 2)} 虚数机器`;
     },
     unlockInfoTooltipArrowStyle() {
       return {
@@ -164,7 +164,7 @@ export default {
             该现实可以重复完成，基于在现实中拥有的反物质获得更强大的奖励。
             <br><br>
             <span v-if="showRunReward">
-              
+
               <GlyphSetPreview
                 text="Teresa's Best Glyph Set"
                 :text-hidden="true"
@@ -249,7 +249,7 @@ export default {
         class="c-teresa-shop"
       >
         <span class="o-teresa-pp">
-          你拥有 {{ format(perkPoints, 2, 0) }} 复兴点数。
+          你拥有 {{ format(perkPoints, 2, 0) }} 特权点。
         </span>
         <PerkShopUpgradeButton
           v-for="upgrade in upgrades"

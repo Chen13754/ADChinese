@@ -75,6 +75,10 @@ export default {
     :style="styleObject"
     @click="onClick"
     @mouseenter="onMouseEnter"
+    @click="onMouseEnter"
+    tabindex="0"
+    @focus="onMouseEnter"
+    @blur="onMouseLeave"
     @mouseleave="onMouseLeave"
   >
     <HintText

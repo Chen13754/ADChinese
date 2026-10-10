@@ -87,7 +87,7 @@ export const Enslaved = {
     const diff = Math.max(thisUpdate - player.lastUpdate, 0);
     const efficiency = this.storedRealTimeEfficiency;
     const maxTime = this.storedRealTimeCap;
-    player.celestials.enslaved.storedReal += diff * efficiency;
+    player.celestials.enslaved.storedReal += YC.time("storedReal", diff) * efficiency;
     if (player.celestials.enslaved.storedReal > maxTime) {
       player.celestials.enslaved.isStoringReal = false;
       player.celestials.enslaved.storedReal = maxTime;

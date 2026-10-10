@@ -172,7 +172,7 @@ export const secretAchievements = [
   {
     id: 45,
     name: "牵丝攀藤",
-    description: "拖动复兴节点一分钟。",
+    description: "拖动特权节点一分钟。",
     checkRequirement: () => player.requirementChecks.permanent.perkTreeDragging++ / 100 >= 60
   },
   {

@@ -22,7 +22,7 @@ export default {
   },
   computed: {
     upgradeStr() {
-      return this.isImaginary ? "虚幻升级" : "现实升级";
+      return this.isImaginary ? "虚数升级" : "现实升级";
     },
     lockEvent() {
       return this.specialLockText ?? this.upgrade.lockEvent;
@@ -38,7 +38,7 @@ export default {
     @confirm="disableLock"
   >
     <template #header>
-      {{ upgradeStr }} Condition Lock
+      {{ upgradeStr }} 条件锁定
     </template>
     <div class="c-modal-message__text">
       你确定要{{ lockEvent }}吗？现在这么做会导致你

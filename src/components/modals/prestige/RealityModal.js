@@ -30,14 +30,14 @@ export default {
   },
   computed: {
     firstRealityText() {
-      return `进行现实将重置所有的游戏内容，以下除外：挑战纪录和统计页面中“概况”条目下的内容。\n\n进行现实将重置前 ${formatInt(13)} 行的所有成就，但你将每隔 ${timeDisplayNoDecimals(30 * 60000)} 自动获得一个成就。\n\n现实之后将基于永恒点数获得现实机器，同时获得一个符文。符文的等级基于永恒点数、复制器和膨胀时间计算。你还能获得一个可用于提升游戏体验的复兴点数，并在第一次现实之后解锁大量的现实升级。`;
+      return `进行现实将重置所有的游戏内容，以下除外：挑战纪录和统计页面中“概况”条目下的内容。\n\n进行现实将重置前 ${formatInt(13)} 行的所有成就，但你将每隔 ${timeDisplayNoDecimals(30 * 60000)} 自动获得一个成就。\n\n现实之后将基于永恒点数获得现实机器，同时获得一个符文。符文的等级基于永恒点数、复制器和膨胀时间计算。你还能获得一个可用于提升游戏体验的特权点，并在第一次现实之后解锁大量的现实升级。`;
     },
     canSacrifice() {
       return RealityUpgrade(19).isEffectActive;
     },
     warnText() {
       if (!this.hasChoice) {
-        return `每次现实时，你只有一个备选符文。你需要关闭这个弹窗，在复兴树中购买 START 节点，才能增加备选符文的数量。`;
+        return `每次现实时，你只有一个备选符文。你需要关闭这个弹窗，在特权树中购买 START 节点，才能增加备选符文的数量。`;
       }
 
       if (this.hasFilter && this.selectedGlyph === undefined) {
@@ -50,7 +50,7 @@ export default {
     gained() {
       const gainedResources = [];
       gainedResources.push(`${formatInt(this.simRealities)} 现实次数`);
-      gainedResources.push(`${formatInt(this.simRealities)} 个复兴点数`);
+      gainedResources.push(`${formatInt(this.simRealities)} 个特权点`);
       gainedResources.push(`${format(this.realityMachines, 2)} 个现实机器`);
       if (this.effarigUnlocked) {
         gainedResources.push(`${format(this.shardsGained, 2)} 个遗迹碎片`);
@@ -185,7 +185,7 @@ export default {
       data-v-reality-modal
     >
       <span v-if="simRealities > 1">
-        即将执行的现实重置次数超过剩余仓库槽位；这可能导致部分符文被自动净化。  
+        即将执行的现实重置次数超过剩余仓库槽位；这可能导致部分符文被自动净化。
       </span>
       <span v-else>
         你的符文仓库没有可用空间，选中的符文将被

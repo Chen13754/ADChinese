@@ -23,7 +23,7 @@ export default {
     lastMachines() {
       return this.lastMachinesTeresa.lt(DC.E10000)
         ? `${format(this.lastMachinesTeresa, 2)} 现实机器`
-        : `${format(this.lastMachinesTeresa.dividedBy(DC.E10000), 2)} 虚幻机器`;
+        : `${format(this.lastMachinesTeresa.dividedBy(DC.E10000), 2)} 虚数机器`;
     },
     dropDownIconClass() {
       return this.hideAlteration ? "far fa-plus-square" : "far fa-minus-square";

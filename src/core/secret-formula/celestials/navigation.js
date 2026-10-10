@@ -303,7 +303,7 @@ export const celestialNavigation = {
           const rm = Teresa.pouredAmount;
           const cost = TeresaUnlocks.shop.price;
           return [
-            "特蕾莎的复兴点商店",
+            "特蕾莎的特权点商店",
             `进贡 ${format(rm, 2)} / ${format(cost, 2)} 现实机器`
           ];
         },
@@ -1521,7 +1521,7 @@ export const celestialNavigation = {
           const upgrade = dim.unlockUpgrade;
           if (upgrade.isAvailableForPurchase) return [
             dmdText,
-            `虚幻机器
+            `虚数机器
             ${format(Math.min(upgrade.currency.value, upgrade.cost), upgrade.canBeBought ? 1 : 2)}
             / ${format(upgrade.cost, 1)}`
           ];
@@ -1619,7 +1619,7 @@ export const celestialNavigation = {
           const upgrade = dim.unlockUpgrade;
           if (upgrade.isAvailableForPurchase) return [
             dmdText,
-            `虚幻机器
+            `虚数机器
             ${format(Math.min(upgrade.currency.value, upgrade.cost), upgrade.canBeBought ? 0 : 2)}
             / ${format(upgrade.cost)}`
           ];
@@ -1691,7 +1691,7 @@ export const celestialNavigation = {
           const upgrade = dim.unlockUpgrade;
           if (upgrade.isAvailableForPurchase) return [
             dmdText,
-            `虚幻机器
+            `虚数机器
             ${format(Math.min(upgrade.currency.value, upgrade.cost), upgrade.canBeBought ? 1 : 2)}
             / ${format(upgrade.cost, 1)}`
           ];
@@ -1838,7 +1838,7 @@ export const celestialNavigation = {
           return [
             "解锁佩勒",
             "反物质之神",
-            `${format(Currency.imaginaryMachines.value, 2)} / ${format(1.6e15, 2)} 虚幻机器`,
+            `${format(Currency.imaginaryMachines.value, 2)} / ${format(1.6e15, 2)} 虚数机器`,
             laitelaString
           ];
         },

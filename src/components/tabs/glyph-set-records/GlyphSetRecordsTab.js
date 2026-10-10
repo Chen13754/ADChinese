@@ -29,8 +29,8 @@ export default {
           `在特蕾莎的现实中，反物质数量的最大值`,
           `${format(player.celestials.teresa.bestRunAM, 2, 2)} 反物质`],
         [Currency.imaginaryMachines.gt(0), Glyphs.copyForRecords(bestReality.iMCapSet),
-          "虚幻机器数量上限的最大值",
-          `${format(MachineHandler.currentIMCap, 2, 2)} 虚幻机器`],
+          "虚数机器数量上限的最大值",
+          `${format(MachineHandler.currentIMCap, 2, 2)} 虚数机器`],
         [Laitela.isUnlocked, Glyphs.copyForRecords(bestReality.laitelaSet),
           `完成莱特拉的现实的最短用时`,
           `${TimeSpan.fromSeconds(player.celestials.laitela.fastestCompletion).toStringShort()}，

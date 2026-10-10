@@ -199,7 +199,7 @@ export const v = {
     },
     shardReduction: {
       id: 1,
-      reward: `你可以花费复兴点来减少每个薇成就的所有层级的目标要求。`,
+      reward: `你可以花费特权点来减少每个薇成就的所有层级的目标要求。`,
       description: () => `拥有 ${formatInt(2)} 个薇成就`,
       requirement: () => V.spaceTheorems >= 2
     },

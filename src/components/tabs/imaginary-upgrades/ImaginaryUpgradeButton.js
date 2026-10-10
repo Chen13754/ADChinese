@@ -81,7 +81,7 @@ export default {
       if (this.canBeBought || !this.isAvailableForPurchase || this.isBought || Pelle.isDoomed) return "";
       const time = MachineHandler.estimateIMTimer(this.upgrade.cost);
       if (isFinite(time)) return TimeSpan.fromSeconds(time).toString();
-      return "Never affordable";
+      return "无法负担";
     },
     toggleLock(upgrade) {
       if (this.isRebuyable) return;
@@ -124,7 +124,7 @@ export default {
             v-if="!isBought"
             :config="config"
             br
-            name="虚幻机器"
+            name="虚数机器"
           />
         </template>
         <ShowFormulaButton :config="config" />

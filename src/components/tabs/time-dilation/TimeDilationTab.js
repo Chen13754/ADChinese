@@ -115,8 +115,8 @@ export default {
       this.maxDT.copyFrom(player.records.thisReality.maxDT);
 
       const estimateText = getDilationTimeEstimate(this.maxDT);
-      if (this.dilatedTimeIncome.lte(0)) this.toMaxTooltip = "No DT gain";
-      else this.toMaxTooltip = estimateText.startsWith("<") ? "Currently Increasing" : estimateText;
+      if (this.dilatedTimeIncome.lte(0)) this.toMaxTooltip = "不产生膨胀时间";
+      else this.toMaxTooltip = estimateText.startsWith("<") ? "正在增加" : estimateText;
     }
   },
   template: `

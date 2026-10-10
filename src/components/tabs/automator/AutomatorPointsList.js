@@ -54,7 +54,7 @@ export default {
           class="l-large-text"
           data-v-automator-points-list
         >
-          复兴树
+          特权树
         </span>
         <div
           v-for="perk in perkSources"
