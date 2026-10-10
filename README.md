@@ -54,6 +54,7 @@ npm run test:browser
 npm run test:timers
 npm run test:interaction
 npm run test:layout
+npm run test:online
 ```
 
 测试使用合成进度，报告与截图保存在 `test-results`；详细范围见 [VERIFICATION.md](VERIFICATION.md)。`npm run build` 仅复制网站必需目录到 `dist`，GitHub Pages 通过 Actions 发布。依赖、缓存、测试报告及测试存档不进入发布包。

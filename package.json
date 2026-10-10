@@ -11,7 +11,8 @@
     "preview": "node tests/server.cjs",
     "build": "node tests/package.cjs",
     "test:timers": "node tests/timers.cjs",
-    "test:interaction": "node tests/interactions.cjs"
+    "test:interaction": "node tests/interactions.cjs",
+    "test:online": "node tests/online.cjs"
   },
   "devDependencies": {
     "acorn": "^8.19.0",

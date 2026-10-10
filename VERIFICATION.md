@@ -24,4 +24,8 @@
 
 本次为 Chromium 浏览器手机尺寸与触控模拟，包含平板和桌面尺寸。未进行实体手机、iOS Safari 或真实软键盘验收。原有第三方云存档、商店支付不属于本次跨设备文件接续功能，未连接账号或进行交易。
 
-线上发布后另行记录资源与存读档复验结果。
+## 线上复验
+
+Pages 部署成功：[Actions 38074783805](https://github.com/Chen13754/ADChinese/actions/runs/38074783805)。已在 https://chen13754.github.io/ADChinese/ 的独立浏览器上下文中验证：标题与手机显示、控制台警告、资源增益、倍率开关、文件导入预览与取消、确认覆盖后复位、真实文件导出、刷新保留进度，以及手机／桌面截图。线上页面无 JavaScript 异常或本站资源失败；版本、样式、音频、许可证资源返回 200，缓存地址返回 404。
+
+线上测试仅使用合成存档，不接触个人浏览器中的游戏进度。报告为本地 `test-results/online-report.json`，截图为 `online-mobile.png` 与 `online-desktop.png`；可用 `npm run test:online` 复验。
