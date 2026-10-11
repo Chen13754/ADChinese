@@ -42,30 +42,41 @@ export const YC = {
     else delete this.rates[id];
   },
   reset() { this.rates = Object.create(null); },
-  addResource(id, text) {
+  addResourceMultiple(id, multiple) { return this.addResource(id, multiple, true); },
+  addResource(id, text, relative = false) {
     const row = YCResources.find(r => r.id === id);
     if (!this.warningAccepted || !row?.unlocked()) throw new Error("请先确认风险，并解锁相应资源");
     if (!GameStorage.canSave()) throw new Error("请等待当前选择或离线计算结束后再修改资源");
     const raw = String(text).trim();
     if (!/^(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(raw)) throw new Error("请输入正整数，可以使用科学计数法，例如 1e100");
     const currency = Currency[id];
+    const before = currency.value;
+    if (relative && (row.number ? before === 0 : before.eq(0))) {
+      throw new Error("当前资源为 0，按倍数增加不会生效；请先自定义增加数量");
+    }
     if (row.number) {
-      const amount = Number(raw), next = currency.value + amount;
-      if (!Number.isSafeInteger(amount) || amount <= 0 || !Number.isSafeInteger(next) || next <= currency.value) {
+      const requested = Number(raw);
+      if (!Number.isSafeInteger(requested) || requested <= 0) throw new Error("请输入有效的正整数");
+      const amount = relative ? before * requested : requested, next = before + amount;
+      if (!Number.isSafeInteger(amount) || amount <= 0 || !Number.isSafeInteger(next) || next <= before) {
         throw new Error("该资源必须是有效的安全整数，增量不能溢出");
       }
       currency.add(amount);
     } else {
-      const amount = new Decimal(raw), next = currency.value.plus(amount);
-      if (!Number.isFinite(amount.exponent) || !Number.isFinite(amount.mantissa) || !amount.gt(0) || !amount.eq(amount.floor()) ||
-          !Number.isFinite(next.exponent) || !Number.isFinite(next.mantissa) || next.gt(Decimal.MAX_VALUE) || !next.gt(currency.value)) {
+      const requested = new Decimal(raw);
+      if (!Number.isFinite(requested.exponent) || !Number.isFinite(requested.mantissa) ||
+          !requested.gt(0) || !requested.eq(requested.floor())) throw new Error("请输入有效的正整数，可以使用科学计数法");
+      const amount = relative ? before.times(requested) : requested, next = before.plus(amount);
+      if (!Number.isFinite(amount.exponent) || !Number.isFinite(amount.mantissa) || !amount.gt(0) ||
+          !Number.isFinite(next.exponent) || !Number.isFinite(next.mantissa) || next.gt(Decimal.MAX_VALUE) || !next.gt(before)) {
         throw new Error("增量无效、超出范围，或相对当前资源太小而无法生效");
       }
-      if (id === "realityMachines" && !Decimal.min(next, MachineHandler.hardcapRM).gt(currency.value)) {
+      if (id === "realityMachines" && !Decimal.min(next, MachineHandler.hardcapRM).gt(before)) {
         throw new Error("现实机器已达原生上限，增量无法生效");
       }
       currency.add(amount);
     }
     GameUI.update();
+    return { added: row.number ? currency.value - before : currency.value.minus(before), value: currency.value };
   },
 };

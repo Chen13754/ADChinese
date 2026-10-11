@@ -9,7 +9,7 @@ export default {
   mounted() { if (!this.confirmed) this.$refs.cancel?.focus(); },
   methods: {
     update() {
-      this.resources = YCResources.filter(r => r.unlocked()).map(r => ({ id: r.id, name: r.name, value: format(Currency[r.id].value, 2, 2) }));
+      this.resources = YCResources.filter(r => r.unlocked()).map(r => ({ id: r.id, name: r.name, value: formatPostBreak(Currency[r.id].value, 2, 2) }));
       this.timers = YCTimers.filter(t => t.unlocked()).map(t => ({ id: t.id, name: t.name, description: t.description }));
       for (const r of this.resources) if (!(r.id in this.amounts)) this.$set(this.amounts, r.id, "100");
       for (const t of this.timers) {
@@ -18,8 +18,12 @@ export default {
     },
     accept() { YC.warningAccepted = true; this.confirmed = true; },
     close() { EventHub.dispatch(GAME_EVENT.CLOSE_MODAL); },
-    add(id, amount) {
-      try { YC.addResource(id, amount); this.status = "资源已增加，增益结果会正常存档。"; }
+    add(id, amount, relative = false) {
+      try {
+        const gain = relative ? YC.addResourceMultiple(id, amount) : YC.addResource(id, amount);
+        const name = YCResources.find(row => row.id === id).name;
+        this.status = name + "已增加 " + formatPostBreak(gain.added, 2, 2) + "，当前 " + formatPostBreak(gain.value, 2, 2) + "。";
+      }
       catch (e) { this.status = e.message; }
     },
     apply(id) {
@@ -50,11 +54,15 @@ export default {
       <template v-else>
         <p>个人使用，请勿传播。这里只显示当前进度已解锁的功能。</p>
         <h3>资源增益</h3>
+        <p>快捷按钮增加当前数量的相应倍数：+1倍即翻倍，+10倍后为原来的11倍。每次点击均按当时数量计算；资源为0时请先自定义增加。</p>
         <section v-for="row in resources" :key="row.id" class="yc-control-row" :data-resource="row.id">
-          <strong>{{ row.name }} <span class="yc-resource-value">{{ row.value }}</span></strong>
-          <div class="yc-actions">
-            <button v-for="n in [1,10,100]" :key="n" class="o-primary-btn" @click="add(row.id, String(n))">+{{ n }}</button>
-            <input v-model="amounts[row.id]" :aria-label="row.name + '增量'" class="c-modal-input" placeholder="例如 1e100" inputmode="text">
+          <strong>{{ row.name }} <span class="yc-resource-value">当前 {{ row.value }}</span></strong>
+          <div class="yc-actions yc-resource-presets">
+            <button v-for="n in [1,10,100,1000]" :key="n" class="o-primary-btn" @click="add(row.id, String(n), true)">+{{ n }}倍</button>
+          </div>
+          <div class="yc-actions yc-resource-custom">
+            <label :for="'yc-amount-' + row.id">自定义增加</label>
+            <input :id="'yc-amount-' + row.id" v-model="amounts[row.id]" :aria-label="row.name + '增量'" class="c-modal-input" placeholder="正整数，如 1e100" inputmode="text" @keydown.enter.prevent="add(row.id, amounts[row.id])">
             <button class="o-primary-btn" @click="add(row.id, amounts[row.id])">增加</button>
           </div>
         </section>
@@ -73,8 +81,8 @@ export default {
         <h3>重置当前存档槽</h3>
         <p>使用原版重置流程，仅清除当前槽的游戏进度；下一步仍需输入确认文字。</p>
         <button class="o-primary-btn" @click="resetSlot">重置当前存档槽…</button>
-        <p class="yc-status" role="status" aria-live="polite">{{ status }}</p>
       </template>
     </div>
+    <p v-if="confirmed && status" class="yc-status" role="status" aria-live="polite">{{ status }}</p>
   </ModalWrapper>`
 };

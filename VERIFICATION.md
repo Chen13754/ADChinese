@@ -1,6 +1,6 @@
 # 验证记录
 
-日期：2026-10-11。修复版本标识：`2026-10-11-fix8`。原生存档版本仍为 25，编码、三个存档槽及 `yc-ad:` 前缀不变。固定上游基线：`9d01a0a6d284c9b76918135c874033c7419bd7bf`。
+日期：2026-10-11。八项修复版本标识：`2026-10-11-fix8`；当前控制台更新标识：`2026-10-11-resource-gains`。原生存档版本仍为 25，编码、三个存档槽及 `yc-ad:` 前缀不变。固定上游基线：`9d01a0a6d284c9b76918135c874033c7419bd7bf`。
 
 ## 八项修复
 
@@ -19,10 +19,11 @@
 
 ## 本地验收
 
-`npm run test:all` 顺序执行九组验收：
+`npm run test:all` 顺序执行十组验收：
 
 - `check`：687 个源码模块语法和相对导入；1579 条新闻的 ID、顺序、动态逻辑与固定基线一致。
 - `browser`：真实文件导出、预览/取消/确认、多槽、失败恢复、刷新复位、原站与个人版往返，以及关闭倍率时的原版对照。
+- `resources`：当前数量 +1／+10／+100／+1000 倍、连续点击、自定义数量/科学计数法/回车、零余额提示、六资源原生接口、大数与小数余额、统计和原生上限、拒绝无效/溢出修改、保存刷新、五尺寸/缩小视口触控。反馈移到滚动区域外，避免遮挡操作；资源/加速区取消原站通用浮动，手机弹窗层级置于导航之上，标题及关闭按钮可触控。
 - `timers`：17 项计时入口的单项、组合、关闭、离线不加速，挑战/暂停/上限与真实游玩时长约束。
 - `interactions`：导航、成就提示、研究树/特权树/天神图缩放、触控购买、弹窗缩小视口、符文布局及结局署名。
 - `regressions`：八项复现转为断言；包含真实存储配额、异步失败、原文下载、恢复操作、模板切换、运行中的原生主循环和实际保存刷新。
@@ -33,13 +34,13 @@
 
 测试夹具已校正困难薇最高5层、挑战位标识及后期游戏时长前提。薇另检查内部卡片与按钮可达性，避免只看根页面宽度而漏检裁切。
 
-报告与截图在忽略的 `test-results`：`acceptance.json`、`functional-report.json`、`timer-report.json`、`interaction-report.json`、`regressions-report.json`、`compatibility-report.json`、`runtime-report.json`、`flows-report.json`、`layout-survey.json`、`v-mobile-fixed.png`。依赖、浏览器、临时文件及合成进度仅放在工程内。
+报告与截图在忽略的 `test-results`：`acceptance.json`、`functional-report.json`、`resources-report.json`、`timer-report.json`、`interaction-report.json`、`regressions-report.json`、`compatibility-report.json`、`runtime-report.json`、`flows-report.json`、`layout-survey.json`、`v-mobile-fixed.png`。依赖、浏览器、临时文件及合成进度仅放在工程内。
 
 ## 发布与线上验收
 
 `npm run build` 使用静态文件白名单打包。发布包排除依赖、缓存、测试脚本、报告、截图和个人存档；原作者署名及许可证保留。
 
-`npm run test:online` 在独立浏览器上下文核对 https://chen13754.github.io/ADChinese/ 的初始化、资源、控制台、文件导入/导出、取消、确认、刷新及手机/桌面截图；另核对部署修复版本的资源与已提交源码一致。报告在 `test-results/online-report.json`。测试不接触用户真实浏览器存档。
+`npm run test:online` 在独立浏览器上下文核对 https://chen13754.github.io/ADChinese/ 的初始化、资源、控制台、文件导入/导出、取消、确认、刷新及手机/桌面截图；另核对当前数量倍数与自定义增量，并检查19个部署资源与已提交源码的 SHA-256 一致。报告在 `test-results/online-report.json`。测试不接触用户真实浏览器存档。
 
 ## 验证边界
 
