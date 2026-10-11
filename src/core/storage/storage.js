@@ -1,10 +1,9 @@
 import { ADNotations } from "../../../modules/notations.js";
 
 import { DEV } from "../../env.js";
-import { devMigrations } from "./dev-migrations.js";
-import { migrations } from "./migrations.js";
 
 import { deepmergeAll } from "../../utility/deepmerge.js";
+import { preparePlayer } from "./validation.js";
 
 export const BACKUP_SLOT_TYPE = {
   ONLINE: 0,
@@ -100,142 +99,235 @@ export const GameStorage = {
     return DEV ? `yc-ad:backupTestTimes-${saveSlot}` : `yc-ad:backupTimes-${saveSlot}`;
   },
 
-  load() {
-    const save = localStorage.getItem(this.localStorageKey);
-    const root = GameSaveSerializer.deserialize(save);
+  loading: false,
+  recovery: undefined,
+  storageFailure: false,
 
-    this.loadRoot(root);
-    Achievements.updateSteamStatus();
+  reportStorageFailure() {
+    if (!this.storageFailure) GameUI.notify.error("浏览器存储写入失败。游戏进度仍在内存中，请立即导出存档文件，再关闭网页。");
+    this.storageFailure = true;
   },
 
-  loadRoot(root) {
-    if (root === undefined) {
-      this.currentSlot = 0;
-      this.loadPlayerObject(Player.defaultStart);
-      return;
+  // All writes are prepared before the first mutation; roll back only keys actually changed.
+  writeBatch(entries) {
+    const previous = new Map();
+    try {
+      for (const key of entries.keys()) previous.set(key, localStorage.getItem(key));
+      const changed = [];
+      try {
+        for (const [key, value] of entries) {
+          if (previous.get(key) === value) continue;
+          if (value === null) localStorage.removeItem(key);
+          else localStorage.setItem(key, value);
+          changed.push(key);
+        }
+      } catch (error) {
+        for (const key of changed.reverse()) {
+          const value = previous.get(key);
+          if (value === null) localStorage.removeItem(key);
+          else localStorage.setItem(key, value);
+        }
+        throw error;
+      }
+      this.storageFailure = false;
+      return true;
+    } catch {
+      this.reportStorageFailure();
+      return false;
     }
+  },
 
-    if (root.saves === undefined) {
-      // Migrate old format
-      this.saves = {
-        0: root,
-        1: undefined,
-        2: undefined
-      };
-      this.currentSlot = 0;
-      this.loadPlayerObject(root);
-      this.loadBackupTimes();
-      this.backupOfflineSlots();
-      this.save(true);
-      return;
+  load() {
+    try {
+      const raw = localStorage.getItem(this.localStorageKey);
+      return this.loadRoot(raw === null ? undefined : GameSaveSerializer.deserialize(raw), raw !== null);
+    } catch {
+      this.enterRecovery("浏览器存储无法读取，请先下载可读取的原始数据。", undefined);
+      return false;
     }
+  },
 
-    this.saves = root.saves;
-    this.currentSlot = root.current;
-    this.loadPlayerObject(this.saves[this.currentSlot]);
-    this.loadBackupTimes();
-    this.backupOfflineSlots();
+  enterRecovery(reason, root) {
+    GameIntervals.stop();
+    this.recovery = { reason, root };
+    if ([0, 1, 2].includes(root?.current)) this.currentSlot = root.current;
+    // onload marks the UI ready after init; show recovery only then.
+    const show = () => {
+      if (!this.recovery) return;
+      if (!GameUI.initialized) { setTimeout(show, 100); return; }
+      Modal.storageRecovery.show();
+    };
+    show();
+  },
+
+  exportRecoveryData() {
+    try {
+      const data = Object.fromEntries(Object.keys(localStorage).filter(key => key.startsWith("yc-ad:"))
+        .map(key => [key, localStorage.getItem(key)]));
+      download(`AD Recovery (${this.exportDateString}).txt`, JSON.stringify(data));
+    } catch { GameUI.notify.error("浏览器禁止读取存储，无法导出原始数据。请保留当前网页。"); }
+  },
+
+  loadRoot(root, hadData = root !== undefined) {
+    if (root === undefined && !hadData) return this.loadTransaction(Player.defaultStart, { persist: false });
+    try {
+      if (!root || typeof root !== "object" || Array.isArray(root)) throw new Error("本地存档无法解码");
+      const legacy = root.saves === undefined;
+      const saves = legacy ? { 0: root, 1: undefined, 2: undefined } : root.saves;
+      const slot = legacy ? 0 : root.current;
+      if (!saves || typeof saves !== "object" || Array.isArray(saves) || ![0, 1, 2].includes(slot) ||
+          Object.keys(saves).some(key => !["0", "1", "2"].includes(key))) throw new Error("本地存档槽结构损坏");
+      const result = this.loadTransaction(saves[slot] === undefined ? Player.defaultStart : saves[slot],
+        { slot, saves, persist: legacy, backupOffline: true });
+      const finish = success => { if (!success) this.enterRecovery("当前存档无法安全加载，原数据已保留。", { current: slot, saves }); return success; };
+      return result?.then ? result.then(finish) : finish(result);
+    } catch (error) {
+      this.enterRecovery(error.message, root);
+      return false;
+    }
   },
 
   loadSlot(slot) {
-    this.currentSlot = slot;
-    // Save current slot to make sure no changes are lost
-    this.save(true);
-    this.loadPlayerObject(this.saves[slot] ?? Player.defaultStart);
-    this.loadBackupTimes();
-    this.backupOfflineSlots();
-    Tabs.all.find(t => t.id === player.options.lastOpenTab).show(false);
-    Modal.hideAll();
-    Cloud.resetTempState();
-    GameUI.notify.info("存档已加载");
-    Achievements.updateSteamStatus();
+    if (![0, 1, 2].includes(slot)) return false;
+    const saves = this.recovery?.root?.saves ?? this.saves;
+    const result = this.loadTransaction(saves[slot] === undefined ? Player.defaultStart : saves[slot],
+      { slot, saves, backupOffline: true });
+    const finish = success => {
+      if (success) {
+        Tabs.all.find(t => t.id === player.options.lastOpenTab)?.show(false);
+        GameUI.notify.info("存档已加载，加速已恢复正常");
+      }
+      return success;
+    };
+    return result?.then ? result.then(finish) : finish(result);
   },
 
   checkImport(saveData) {
-    try {
-      const value = GameSaveSerializer.deserialize(String(saveData).trim());
-      if (!value || typeof value !== "object" || Array.isArray(value)) return "存档格式无法识别";
-      if (this.checkPlayerObject(value)) return this.checkPlayerObject(value);
-      const latestVersion = Math.max(Player.defaultStart.version, ...Object.keys(migrations.patches).map(Number));
-      if (typeof value.version !== "undefined" && (!Number.isFinite(value.version) || value.version > latestVersion)) {
-        return "该存档来自不支持的游戏版本，请使用与本网页兼容的存档";
-      }
-      const amount = new Decimal(value.antimatter ?? value.money);
-      if (!Number.isFinite(amount.exponent) || !Number.isFinite(amount.mantissa) || amount.lt(0)) return "反物质数值无效";
-      // Do not run migrations in preview: legacy patches can schedule UI work.
-      for (const key of ["options", "records", "reality", "celestials", "dimensions"]) {
-        if (value[key] !== undefined && (!value[key] || typeof value[key] !== "object" || Array.isArray(value[key]))) {
-          return `存档的 ${key} 数据损坏`;
-        }
-      }
-      if (value.lastUpdate !== undefined && (!Number.isFinite(value.lastUpdate) || value.lastUpdate < 0)) return "存档时间无效";
-      for (const key of ["antimatter", "infinity", "time"]) {
-        const rows = value.dimensions?.[key];
-        if (rows !== undefined && (!Array.isArray(rows) || rows.length !== 8 || rows.some(r => !r || typeof r !== "object"))) return "维度数据损坏";
-      }
-      return "";
-    } catch { return "存档损坏，或无法完成版本迁移"; }
+    try { preparePlayer(GameSaveSerializer.deserialize(String(saveData).trim())); return ""; }
+    catch (error) { return error.message || "存档损坏，或无法完成版本迁移"; }
   },
 
-  import(saveData) {
-    if (tryImportSecret(saveData) || Theme.tryUnlock(saveData)) return false;
-    const error = this.checkImport(saveData);
-    if (error || !this.canSave()) {
-      Modal.message.show(error || "请等待当前选择或离线计算结束后再导入");
-      return false;
-    }
+  loadTransaction(save, options = {}) {
+    if (this.loading || (!this.recovery && !this.canSave())) return false;
+    let prepared;
+    try { prepared = preparePlayer(save); }
+    catch (error) { Modal.message.show(error.message); return false; }
     const previous = {
-      player: deepmergeAll([{}, player]), saves: { ...this.saves }, slot: this.currentSlot,
-      rates: { ...YC.rates }, offlineEnabled: this.offlineEnabled, offlineTicks: this.offlineTicks,
-      oldBackupTimer: this.oldBackupTimer, lastBackupTimes: deepmergeAll([{}, this.lastBackupTimes]),
-      local: Object.fromEntries(Object.keys(localStorage).filter(k => k.startsWith("yc-ad:")).map(k => [k, localStorage.getItem(k)])),
+      player, saves: this.saves, slot: this.currentSlot, rates: { ...YC.rates },
+      offlineEnabled: this.offlineEnabled, offlineTicks: this.offlineTicks,
+      oldBackupTimer: this.oldBackupTimer, lastBackupTimes: this.lastBackupTimes,
+      lastSaveTime: this.lastSaveTime, saved: this.saved, recovery: this.recovery,
+      lastUpdate: player.lastUpdate, lastUpdateOnLoad: this.lastUpdateOnLoad,
+      ignoreBackupTimer: this.ignoreBackupTimer, additionalEnd: GameEnd.additionalEnd,
+      running: GameIntervals.all().map(interval => interval.isStarted),
     };
-    const restore = cause => {
+    GameIntervals.stop();
+    this.loading = true;
+    this.pendingWrites = new Map();
+    let committedWrites;
+    const restore = () => {
       GameIntervals.stop();
+      if (committedWrites) this.writeBatch(committedWrites);
       ui.view.modal.progressBar = undefined;
       Async.enabled = true;
       GameUI.notify.showBlackHoles = true;
       this.currentSlot = previous.slot;
       this.saves = previous.saves;
       this.offlineEnabled = false;
-      try { this.loadPlayerObject(previous.player); }
-      catch { player = previous.player; this.saves[this.currentSlot] = player; Lazy.invalidateAll(); GameUI.update(); }
-      this.offlineEnabled = previous.offlineEnabled;
-      this.offlineTicks = previous.offlineTicks;
-      this.oldBackupTimer = previous.oldBackupTimer;
-      this.lastBackupTimes = previous.lastBackupTimes;
-      YC.rates = previous.rates;
-      let storageRestored = true;
-      try {
-        for (const key of Object.keys(localStorage).filter(k => k.startsWith("yc-ad:"))) {
-          if (!(key in previous.local)) localStorage.removeItem(key);
-        }
-        for (const [key, value] of Object.entries(previous.local)) localStorage.setItem(key, value);
-      } catch { storageRestored = false; }
-      Modal.message.show(storageRestored
-        ? "导入失败，已恢复原来的进度。"
-        : "导入失败，当前进度已在内存中恢复，但浏览器存储写入失败。请先导出存档，再关闭网页。");
-      console.error("Save import failed", cause);
+      this.loading = true;
+      try { this.loadPlayerObject(previous.player, { player: previous.player }); }
+      catch { Lazy.invalidateAll(); }
+      finally {
+        player = previous.player;
+        player.lastUpdate = previous.lastUpdate;
+        GameEnd.additionalEnd = previous.additionalEnd;
+        this.lastUpdateOnLoad = previous.lastUpdateOnLoad;
+        this.ignoreBackupTimer = previous.ignoreBackupTimer;
+        this.backupOnLoad = false;
+        Object.assign(this, { offlineEnabled: previous.offlineEnabled, offlineTicks: previous.offlineTicks,
+          oldBackupTimer: previous.oldBackupTimer, lastBackupTimes: previous.lastBackupTimes,
+          lastSaveTime: previous.lastSaveTime, saved: previous.saved, recovery: previous.recovery });
+        YC.rates = previous.rates;
+        this.loading = false;
+        this.pendingWrites = undefined;
+        GameIntervals.all().forEach((interval, i) => { if (previous.running[i]) interval.restart(); });
+      }
+      Modal.message.show("加载失败，已保留原来的存档槽和进度。若浏览器保存失败，请先导出文件。");
       return false;
     };
     const finish = () => {
-      GlyphAppearanceHandler.clearInvalidCosmetics();
-      if (player.speedrun?.isActive) Speedrun.setSegmented(true);
-      this.save(true);
-      Cloud.resetTempState();
-      this.resetBackupTimer();
-      Tab.options.subtabs[0].show();
-      GameUI.notify.info("已导入存档，加速已恢复正常");
-      Achievements.updateSteamStatus();
-      return true;
+      try {
+        if (options.resetBackupTimer) this.resetBackupTimer();
+        if (options.beforeCommit) options.beforeCommit();
+        GameUI.update();
+        // Initialization and offline simulation must both succeed before any persistent writes.
+        preparePlayer(player);
+        if (options.persist !== false) this.pendingWrites.set(this.localStorageKey,
+          GameSaveSerializer.serialize({ current: this.currentSlot, saves: this.saves }));
+        const originals = new Map([...this.pendingWrites.keys()].map(key => [key, localStorage.getItem(key)]));
+        if (!this.writeBatch(this.pendingWrites)) return restore();
+        committedWrites = originals;
+        if (options.persist !== false) this.lastSaveTime = Date.now();
+        this.loading = false;
+        this.pendingWrites = undefined;
+        this.recovery = undefined;
+        this.offlineEnabled = previous.offlineEnabled;
+        this.offlineTicks = previous.offlineTicks;
+        Modal.hideAll();
+        Cloud.resetTempState();
+        this.postLoadStuff();
+        if (prepared.previousVersion) {
+          EventHub.dispatch(GAME_EVENT.SAVE_CONVERTED_FROM_PREVIOUS_VERSION);
+          Modal.uiChoice.show();
+        }
+        Achievements.updateSteamStatus();
+        this.showCatchup(this.pendingCatchup);
+        return true;
+      } catch { return restore(); }
     };
     try {
-      const newPlayer = GameSaveSerializer.deserialize(String(saveData).trim());
-      this.oldBackupTimer = player.backupTimer;
-      Modal.hideAll(); Quote.clearAll(); AutomatorBackend.clearEditor();
-      const loading = this.loadPlayerObject(newPlayer);
-      return loading?.then ? loading.then(finish).catch(restore) : finish();
-    } catch (cause) { return restore(cause); }
+      this.currentSlot = options.slot ?? this.currentSlot;
+      const sourceSaves = options.saves ?? this.saves;
+      this.saves = Object.fromEntries([0, 1, 2].map(slot => [slot, sourceSaves[slot]]));
+      this.loadBackupTimes();
+      this.oldBackupTimer = options.resetBackupTimer ? previous.player.backupTimer : 0;
+      this.offlineEnabled = options.offlineEnabled ?? this.offlineEnabled;
+      this.offlineTicks = options.offlineTicks ?? this.offlineTicks;
+      if (options.reserve) this.saveToBackup(AutoBackupSlots.find(slot => slot.type === BACKUP_SLOT_TYPE.RESERVE).id,
+        previous.player.backupTimer, previous.player);
+      this.backupOnLoad = Boolean(options.backupOffline);
+      const result = this.loadPlayerObject(prepared.player, prepared);
+      return result?.then ? result.then(finish, restore) : finish();
+    } catch { return restore(); }
+  },
+
+  import(saveData) {
+    if (tryImportSecret(saveData) || Theme.tryUnlock(saveData)) return false;
+    const result = this.loadTransaction(GameSaveSerializer.deserialize(String(saveData).trim()), { resetBackupTimer: true,
+      beforeCommit: () => {
+        GlyphAppearanceHandler.clearInvalidCosmetics();
+        if (player.speedrun?.isActive) Speedrun.setSegmented(true);
+      }
+    });
+    const finish = success => {
+      this.offlineEnabled = undefined;
+      this.offlineTicks = undefined;
+      if (success) {
+        Tab.options.subtabs[0].show();
+        GameUI.notify.info("已导入存档，加速已恢复正常");
+      }
+      return success;
+    };
+    return result?.then ? result.then(finish) : finish(result);
+  },
+
+  restoreBackup(id) {
+    const save = this.loadFromBackup(id);
+    if (!save) return false;
+    const result = this.loadTransaction(save, { reserve: true, resetBackupTimer: true,
+      offlineEnabled: player.options.loadBackupWithoutOffline ? false : undefined });
+    const finish = success => { if (success) GameUI.notify.info(`游戏已加载备份槽位 #${id}`); return success; };
+    return result?.then ? result.then(finish) : finish(result);
   },
 
   async importAsFile(file) {
@@ -247,57 +339,18 @@ export const GameStorage = {
   },
 
   overwriteSlot(slot, saveData) {
-    this.saves[slot] = saveData;
-    if (slot === this.currentSlot) {
-      this.loadPlayerObject(saveData);
-    }
-
-    this.save(true);
+    if (![0, 1, 2].includes(slot)) return false;
+    try { preparePlayer(saveData); } catch { return false; }
+    if (slot === this.currentSlot) return this.loadTransaction(saveData);
+    const saves = { ...this.saves, [slot]: saveData };
+    if (!this.writeBatch(new Map([[this.localStorageKey, GameSaveSerializer.serialize({ current: this.currentSlot, saves })]]))) return false;
+    this.saves = saves;
+    return true;
   },
 
-  // Some minimal save verification; if the save is valid then this returns an empty string, otherwise it returns a
-  // a string roughly stating what's wrong with the save. In order for importing to work properly, this must return
-  // an empty string.
+  // Preview and all loading entry points share the same candidate validation.
   checkPlayerObject(save) {
-    // Sometimes save is the output of GameSaveSerializer.deserialize, and if that function fails then it will result
-    // in the input parameter here being undefined
-    if (save === undefined || save === null) return "存档解码失败（格式无效）";
-    // Right now all we do is check for the existence of an antimatter prop, but if we wanted to do further save
-    // verification then here's where we'd do it
-    if (save.money === undefined && save.antimatter === undefined) return "存档中没有“antimatter”属性";
-
-    // Recursively check for any NaN props and add any we find to an array
-    const invalidProps = [];
-    function checkNaN(obj, path) {
-      let hasNaN = false;
-      for (const key in obj) {
-        const prop = obj[key];
-        let thisNaN;
-        switch (typeof prop) {
-          case "object":
-            thisNaN = checkNaN(prop, `${path}.${key}`);
-            hasNaN = hasNaN || thisNaN;
-            break;
-          case "number":
-            thisNaN = Number.isNaN(prop);
-            hasNaN = hasNaN || thisNaN;
-            if (thisNaN) invalidProps.push(`${path}.${key}`);
-            break;
-          case "string":
-            // If we're attempting to import, all NaN entries will still be strings
-            thisNaN = prop === "NaN";
-            hasNaN = hasNaN || thisNaN;
-            if (thisNaN) invalidProps.push(`${path}.${key}`);
-            break;
-        }
-      }
-      return hasNaN;
-    }
-    checkNaN(save, "player");
-
-    if (invalidProps.length === 0) return "";
-    return `找到 ${format(invalidProps.length)} 个 NaN 的存档数据：
-      ${invalidProps.join("、")}`;
+    try { preparePlayer(save); return ""; } catch (error) { return error.message; }
   },
 
   // A few things in the current game state can prevent saving, which we want to do for all forms of saving
@@ -306,40 +359,50 @@ export const GameStorage = {
     const isSimulating = ui.$viewModel.modal.progressBar !== undefined && !ignoreSimulation;
     const isEnd = (GameEnd.endState >= END_STATE_MARKERS.SAVE_DISABLED && !GameEnd.removeAdditionalEnd) ||
       GameEnd.endState >= END_STATE_MARKERS.INTERACTIVITY_DISABLED;
-    return !isEnd && !(isSelectingGlyph || isSimulating);
+    return !this.loading && !this.recovery && !isEnd && !(isSelectingGlyph || isSimulating);
   },
 
   save(silent = true, manual = false) {
-    if (!this.canSave()) return;
+    if (!this.canSave()) return false;
+    const root = { current: this.currentSlot, saves: this.saves };
+    if (!this.writeBatch(new Map([[this.localStorageKey, GameSaveSerializer.serialize(root)]]))) return false;
     this.lastSaveTime = Date.now();
     GameIntervals.save.restart();
     if (manual && ++this.saved > 99) SecretAchievement(12).unlock();
-    const root = {
-      current: this.currentSlot,
-      saves: this.saves
-    };
-    localStorage.setItem(this.localStorageKey, GameSaveSerializer.serialize(root));
     if (!silent) GameUI.notify.info("游戏已存档");
+    return true;
   },
 
-  // Saves a backup, updates save timers (this is called before nextBackup is updated), and then saves the timers too.
-  // When checking offline backups, this call typically resolves during offline progress simulation, so in this case
-  // we want to ignore that (which saves the game state pre-simulation). This is because it's messier and less useful
-  // to the player if we instead defer the call until after simulation
-  saveToBackup(backupSlot, backupTimer) {
-    if (!this.canSave(true)) return;
-    localStorage.setItem(this.backupDataKey(this.currentSlot, backupSlot), GameSaveSerializer.serialize(player));
-    this.lastBackupTimes[backupSlot] = {
-      backupTimer,
-      date: Date.now(),
-    };
-    localStorage.setItem(this.backupTimeKey(this.currentSlot), GameSaveSerializer.serialize(this.lastBackupTimes));
+  saveToBackup(backupSlot, backupTimer, source = player) {
+    if (!this.loading && !this.canSave(true)) return false;
+    if (!AutoBackupSlots.some(slot => slot.id === backupSlot) || !Number.isFinite(backupTimer) || backupTimer < 0) return false;
+    const times = { ...this.lastBackupTimes, [backupSlot]: { backupTimer, date: Date.now() } };
+    const entries = new Map([
+      [this.backupDataKey(this.currentSlot, backupSlot), GameSaveSerializer.serialize(source)],
+      [this.backupTimeKey(this.currentSlot), GameSaveSerializer.serialize(times)]
+    ]);
+    if (this.loading) {
+      for (const [key, value] of entries) this.pendingWrites.set(key, value);
+    } else if (!this.writeBatch(entries)) return false;
+    this.lastBackupTimes = times;
+    return true;
   },
 
-  // Does not actually load, but returns an object which is meant to be passed on to loadPlayerObject()
+  backupRaw(backupSlot) {
+    try { return localStorage.getItem(this.backupDataKey(this.currentSlot, backupSlot)); }
+    catch { return undefined; }
+  },
+
   loadFromBackup(backupSlot) {
-    const data = localStorage.getItem(this.backupDataKey(this.currentSlot, backupSlot));
-    return GameSaveSerializer.deserialize(data);
+    const raw = this.backupRaw(backupSlot);
+    if (!raw) return undefined;
+    try { return preparePlayer(GameSaveSerializer.deserialize(raw)).player; }
+    catch { return undefined; }
+  },
+
+  exportBackupRaw(backupSlot) {
+    const raw = this.backupRaw(backupSlot);
+    if (raw) download(`AD Backup ${backupSlot} (${this.exportDateString}).txt`, raw);
   },
 
   // Check for the amount of time spent offline and perform an immediate backup for the longest applicable slot
@@ -364,24 +427,21 @@ export const GameStorage = {
   },
 
   // Loads in all the data from previous backup times in localStorage
+  validBackupTime(time) {
+    return time && Number.isFinite(time.backupTimer) && time.backupTimer >= 0 && Number.isFinite(time.date) && time.date >= 0;
+  },
+
   loadBackupTimes() {
-    this.lastBackupTimes = GameSaveSerializer.deserialize(localStorage.getItem(this.backupTimeKey(this.currentSlot)));
-    if (!this.lastBackupTimes) this.lastBackupTimes = {};
-    for (const backupInfo of AutoBackupSlots) {
-      const key = backupInfo.id;
-      if (!this.lastBackupTimes[key]) {
-        this.lastBackupTimes[key] = {
-          backupTimer: 0,
-          date: 0,
-        };
-      }
-    }
+    const raw = GameSaveSerializer.deserialize(localStorage.getItem(this.backupTimeKey(this.currentSlot)));
+    this.lastBackupTimes = Object.fromEntries(AutoBackupSlots.map(({ id }) =>
+      [id, this.validBackupTime(raw?.[id]) ? raw[id] : { backupTimer: 0, date: 0 }]));
   },
 
   // This is checked in the checkEverySecond game interval. Determining which slots to save has a 800ms grace time to
   // account for delays occurring from the saving operation itself; without this, the timer slips backwards by a second
   // every time it saves
   tryOnlineBackups() {
+    if (this.storageFailure || this.loading || this.recovery) return;
     const toBackup = [];
     for (const backupInfo of AutoBackupSlots.filter(slot => slot.type === BACKUP_SLOT_TYPE.ONLINE)) {
       const id = backupInfo.id;
@@ -394,8 +454,9 @@ export const GameStorage = {
   // Set the next backup time, but make sure to skip forward an appropriate amount if a load or import happened,
   // since these may cause the backup timer to be significantly behind
   resetBackupTimer() {
-    const latestBackupTime = Object.values(this.lastBackupTimes).map(t => t && t.backupTimer).max();
-    player.backupTimer = Math.max(this.oldBackupTimer, player.backupTimer, latestBackupTime);
+    const valid = value => Number.isFinite(value) && value >= 0 ? value : 0;
+    const times = Object.values(this.lastBackupTimes).map(time => valid(time?.backupTimer));
+    player.backupTimer = Math.max(valid(this.oldBackupTimer), valid(player.backupTimer), ...times);
   },
 
   // Saves the current game state to the first reserve slot it finds
@@ -444,26 +505,31 @@ export const GameStorage = {
   },
 
   importBackupsFromFile(importText) {
-    const backupData = GameSaveSerializer.deserialize(importText);
-    const validIDs = AutoBackupSlots.map(s => String(s.id));
-    if (!backupData || !backupData.time || Object.keys(backupData).some(k => k !== "time" &&
-        (!validIDs.includes(k) || !backupData.time[k] || this.checkImport(GameSaveSerializer.serialize(backupData[k]))))) {
+    if (!this.canSave()) return false;
+    try {
+      const data = GameSaveSerializer.deserialize(importText);
+      const ids = AutoBackupSlots.map(slot => String(slot.id));
+      if (!data || typeof data !== "object" || Array.isArray(data) || !data.time || typeof data.time !== "object" || Array.isArray(data.time)) throw new Error();
+      const keys = Object.keys(data).filter(key => key !== "time");
+      if (!keys.length || keys.some(key => !ids.includes(key) || !this.validBackupTime(data.time[key])) ||
+          Object.keys(data.time).some(key => !ids.includes(key) || !this.validBackupTime(data.time[key]))) throw new Error();
+      const entries = new Map();
+      const times = { ...this.lastBackupTimes };
+      for (const key of keys) {
+        preparePlayer(data[key]);
+        entries.set(this.backupDataKey(this.currentSlot, Number(key)), GameSaveSerializer.serialize(data[key]));
+        times[key] = { ...data.time[key] };
+      }
+      entries.set(this.backupTimeKey(this.currentSlot), GameSaveSerializer.serialize(times));
+      if (!this.writeBatch(entries)) return false;
+      this.lastBackupTimes = times;
+      this.resetBackupTimer();
+      GameUI.notify.info("存档备份文件已成功从文件导入。");
+      return true;
+    } catch {
       GameUI.notify.error("备份文件无效，现有存档和备份保持不变");
       return false;
     }
-    localStorage.setItem(this.backupTimeKey(this.currentSlot), GameSaveSerializer.serialize(backupData.time));
-    for (const backupKey of Object.keys(backupData)) {
-      if (backupKey === "time") continue;
-      const id = Number(backupKey);
-      const storageKey = this.backupDataKey(this.currentSlot, id);
-      localStorage.setItem(storageKey, GameSaveSerializer.serialize(backupData[backupKey]));
-      this.lastBackupTimes[id] = {
-        backupTimer: backupData.time[id].backupTimer,
-        date: backupData.time[id].date,
-      };
-    }
-    this.resetBackupTimer();
-    GameUI.notify.info("存档备份文件已成功从文件导入。");
   },
 
   // There are a couple props which may need to export with different values, so we handle that here
@@ -479,53 +545,25 @@ export const GameStorage = {
   },
 
   hardReset() {
+    if (this.recovery) {
+      const root = this.recovery.root;
+      return this.loadTransaction(Player.defaultStart, {
+        slot: [0, 1, 2].includes(root?.current) ? root.current : this.currentSlot,
+        saves: root?.saves && typeof root.saves === "object" && !Array.isArray(root.saves) ? root.saves : this.saves,
+        offlineEnabled: false,
+      });
+    }
     this.loadPlayerObject(Player.defaultStart);
     this.save(true);
     Tab.dimensions.antimatter.show();
     Cloud.resetTempState();
   },
 
-  loadPlayerObject(playerObject) {
+  loadPlayerObject(playerObject, prepared) {
+    const candidate = prepared ?? preparePlayer(playerObject);
     YC.reset();
     this.saved = 0;
-
-    const checkString = this.checkPlayerObject(playerObject);
-    if (playerObject === Player.defaultStart || checkString !== "") {
-      if (DEV && checkString !== "") {
-        // eslint-disable-next-line no-console
-        console.log(`存档文件无效并已重置——${checkString}`);
-      }
-      player = deepmergeAll([{}, Player.defaultStart]);
-      player.records.gameCreatedTime = Date.now();
-      player.lastUpdate = Date.now();
-      if (DEV) {
-        devMigrations.setLatestTestVersion(player);
-      }
-    } else {
-      // We want to support importing from versions much older than the newest pre-reality version, but we also want
-      // to support in-dev versions so we don't lose access to the large bank of in-dev saves we've accumulated. As
-      // a result, we need to be careful with what order we apply the dev/live migrations and the deepmerge with the
-      // default player object to fill in missing props.
-
-      // For pre-Reality versions, we additionally need to fire off an event to ensure certain achievements and
-      // notifications trigger properly. Missing props are filled in at this step via deepmerge
-      const isPreviousVersionSave = playerObject.version < migrations.firstRealityMigration;
-      player = migrations.patchPreReality(playerObject);
-      if (isPreviousVersionSave) {
-        if (DEV) devMigrations.setLatestTestVersion(player);
-        EventHub.dispatch(GAME_EVENT.SAVE_CONVERTED_FROM_PREVIOUS_VERSION);
-      }
-
-      // All dev migrations are applied in-place, mutating the player object. Note that since we only want to apply dev
-      // migrations in a dev environment, this means that test saves may fail to migrate on the live version
-      if (DEV && player.options.testVersion !== undefined) {
-        devMigrations.patch(player);
-      }
-
-      // Post-reality migrations are separated from pre-reality because they need to happen after any dev migrations,
-      // which themselves must happen after the deepmerge
-      player = migrations.patchPostReality(player);
-    }
+    player = candidate.player;
 
     this.saves[this.currentSlot] = player;
     this.lastUpdateOnLoad = player.lastUpdate;
@@ -555,6 +593,9 @@ export const GameStorage = {
     EventHub.dispatch(GAME_EVENT.GAME_LOAD);
     AutomatorBackend.initializeFromSave();
     Lazy.invalidateAll();
+
+    if (this.backupOnLoad && this.loading) this.backupOfflineSlots();
+    this.backupOnLoad = false;
 
     let loading;
     const rawDiff = Date.now() - player.lastUpdate;
@@ -589,17 +630,24 @@ export const GameStorage = {
     // the only way to get this to display, as it won't display even if called after init() entirely nor is it getting
     // actively hidden by Modal.hideAll(), so delaying it asynchronously gets past whatever is causing it to not appear.
     // Delay time is relatively long to make it more likely to work on much slower computers.
-    if (rawDiff > 1000 * 86400 * 14) {
-      if (["S4", "S9"].includes(Theme.current().name)) Theme.set("Normal");
-      // Looks like the game takes too long to load so we need to setTimeout else it doesn't check for the notation.
-      setTimeout(() => {
-        if (Notations.current.isPainful) Notation.mixedScientific.setAsCurrent();
-      }, 2500);
-      setTimeout(() => Modal.catchup.show(rawDiff), 5000);
-    }
+    this.pendingCatchup = rawDiff;
+    if (!this.loading) this.showCatchup(rawDiff);
     return loading;
   },
+  showCatchup(rawDiff) {
+    if (!(rawDiff > 1000 * 86400 * 14)) return;
+    const loadedPlayer = player;
+    if (["S4", "S9"].includes(Theme.current().name)) Theme.set("Normal");
+    setTimeout(() => {
+      if (player === loadedPlayer && !this.loading && !this.recovery && Notations.current.isPainful) Notation.mixedScientific.setAsCurrent();
+    }, 2500);
+    setTimeout(() => {
+      if (player === loadedPlayer && !this.loading && !this.recovery) Modal.catchup.show(rawDiff);
+    }, 5000);
+  },
+
   postLoadStuff() {
+    if (this.loading || this.recovery) return;
     // This is called from simulateTime, if that's called; otherwise, it gets called
     // manually above
     GameIntervals.restart();

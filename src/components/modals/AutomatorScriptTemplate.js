@@ -43,11 +43,12 @@ export default {
     params: () => GameDatabase.reality.automator.templates.paramTypes,
     validWarnings() {
       return this.invalidInputCount === 0
-        ? this.warnings().concat(this.templateScript?.warnings)
+        ? this.warnings().concat(this.templateScript?.warnings ?? [])
         : this.warnings();
     },
     templateScript() {
-      if (this.invalidInputCount !== 0) return null;
+      if (this.invalidInputCount !== 0 || !this.templateProps ||
+          this.inputs.some(input => this.templateProps[input.name] === undefined)) return null;
       return new ScriptTemplate(this.templateProps, this.name);
     }
   },
@@ -55,19 +56,28 @@ export default {
   // behavior to props that exist on declaration. We need all the dynamically generated inputs to be reactive, so we
   // specifically $set them here on initialization; additionally we give them a default value so that later function
   // calls don't error out from undefined inputs.
-  created() {
-    for (const input of this.inputs) {
-      const boolProp = this.paramTypeObject(input.type).boolDisplay;
-      if (boolProp) {
-        this.$set(this.templateInputs, input.name, false);
-        this.buttonTextStrings[input.name] = boolProp[1];
-      } else {
-        this.$set(this.templateInputs, input.name, "");
-        this.invalidInputCount++;
-      }
-    }
+  watch: {
+    name() { this.initializeInputs(); }
   },
+  created() { this.initializeInputs(); },
   methods: {
+    initializeInputs() {
+      this.templateInputs = {};
+      this.buttonTextStrings = [];
+      this.templateProps = null;
+      this.currentPreset = "";
+      this.invalidInputCount = 0;
+      for (const input of this.inputs) {
+        const boolProp = this.paramTypeObject(input.type).boolDisplay;
+        if (boolProp) {
+          this.$set(this.templateInputs, input.name, false);
+          this.buttonTextStrings[input.name] = boolProp[1];
+        } else {
+          this.$set(this.templateInputs, input.name, "");
+          this.invalidInputCount++;
+        }
+      }
+    },
     update() {
       this.isBlock = player.reality.automator.type === AUTOMATOR_TYPE.BLOCK;
     },
@@ -108,13 +118,13 @@ export default {
       const nameMatch = this.templateProps.treeStudies.match(/^NAME (.{1,4})$/u);
       const idMatch = this.templateProps.treeStudies.match(/^ID (\d)$/u);
 
+      this.currentPreset = "";
       if (nameMatch) {
-        const nameStr = nameMatch ? nameMatch[1] : "";
-        this.currentPreset = this.presets.find(x => x.name === nameStr).name;
+        this.currentPreset = this.presets.find(x => x.name === nameMatch[1])?.name ?? "";
       } else if (idMatch) {
-        const idStr = idMatch ? idMatch[1] : "";
-        this.currentPreset = this.presets.some((x, y) => y === idStr - 1) ? idStr : "";
+        this.currentPreset = this.presets[Number(idMatch[1]) - 1] ? idMatch[1] : "";
       }
+      if ((nameMatch || idMatch) && this.currentPreset === "") this.invalidInputCount++;
 
       this.templateProps.treePreset = this.currentPreset === "" ? null : this.currentPreset;
     },
@@ -125,6 +135,7 @@ export default {
       this.updateTemplateProps();
     },
     copyAndClose() {
+      if (!this.templateScript) return;
       if (this.isBlock) {
         const newTemplateBlock = {
           name: `模板：${this.displayName}`,
@@ -153,7 +164,7 @@ export default {
       使用研究树预设：
       <button
         v-for="(preset, presetNumber) in presets"
-        :key="preset.name"
+        :key="presetNumber"
         class="o-primary-btn o-load-preset-button-margin"
         data-v-automator-script-template
         @click="loadPreset(preset.name, presetNumber + 1)"

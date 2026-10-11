@@ -65,6 +65,7 @@ export default {
       this.mouseOverInterval = setTimeout(() => this.isMouseOver = false, 300);
     },
     onClick() {
+      this.onMouseEnter();
       if (this.id === 11) {
         SecretAchievement(11).unlock();
       }
@@ -75,7 +76,6 @@ export default {
     :style="styleObject"
     @click="onClick"
     @mouseenter="onMouseEnter"
-    @click="onMouseEnter"
     tabindex="0"
     @focus="onMouseEnter"
     @blur="onMouseLeave"

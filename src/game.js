@@ -974,7 +974,7 @@ export function simulateTime(seconds, real, fast) {
     afterSimulation(seconds, playerStart);
   } else {
     const progress = {};
-    ui.view.modal.progressBar = {};
+    GameIntervals.stop();
     return Async.run(loopFn,
       ticks,
       {
@@ -1020,13 +1020,10 @@ export function simulateTime(seconds, real, fast) {
         asyncProgress: doneSoFar => {
           ui.$viewModel.modal.progressBar.current = doneSoFar;
         },
-        asyncExit: () => {
-          ui.$viewModel.modal.progressBar = undefined;
-          // .postLoadStuff will restart GameIntervals
-          GameStorage.postLoadStuff();
-        },
         then: () => {
+          ui.$viewModel.modal.progressBar = undefined;
           afterSimulation(seconds, playerStart);
+          GameStorage.postLoadStuff();
         },
         progress
       });

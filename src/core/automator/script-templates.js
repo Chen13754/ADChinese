@@ -17,19 +17,19 @@ export class ScriptTemplate {
     this.lines = [];
     this.warnings = [];
     switch (templateName) {
-      case "刷永恒点数":
+      case "Climb EP":
         this.templateClimbEP(params);
         break;
-      case "刷永恒次数":
+      case "Grind Eternities":
         this.templateGrindEternities(params);
         break;
-      case "刷无限次数":
+      case "Grind Infinities":
         this.templateGrindInfinities(params);
         break;
-      case "完成永恒挑战":
+      case "Complete Eternity Challenge":
         this.templateDoEC(params);
         break;
-      case "解锁膨胀":
+      case "Unlock Dilation":
         this.templateUnlockDilation(params);
         break;
       default:
@@ -65,6 +65,7 @@ export class ScriptTemplate {
     if (params.treePreset) {
       const presetObj = player.timestudy.presets.map((p, i) => ({ ...p, id: i + 1 }))
         .find(p => (p.name === params.treePreset || p.id === Number(params.treePreset)));
+      if (!presetObj) throw new Error("研究树预设不存在");
       const preset = presetObj.name ? `name ${presetObj.name}` : `id ${presetObj.id}`;
       this.storedTreeStr = `studies${nowaitStr} load ${preset}`;
       this.storedTreeObj = new TimeStudyTree(presetObj.studies);

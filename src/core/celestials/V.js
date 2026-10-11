@@ -78,9 +78,10 @@ class VRunUnlockState extends GameMechanicState {
       playerData.runGlyphs[this.id] = Glyphs.copyForRecords(Glyphs.active.filter(g => g !== null));
     }
 
+    if (!V.isFlipped && this.config.isHard) return;
+
     while (this.completions < this.config.values.length &&
     Decimal.gte(playerData.runRecords[this.id], this.conditionValue)) {
-      if (!V.isFlipped && this.config.isHard) continue;
       this.completions++;
       GameUI.notify.success(`你已完成第 ${formatInt(this.completions)} 层级的 “${this.config.name}”`);
 

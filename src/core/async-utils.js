@@ -52,13 +52,10 @@ window.Async = {
       // Disable async if we're already doing async
       this.enabled = false;
       const runResult = this._run(fun, maxIter, config);
-      return config.then ? runResult.then(() => {
-        config.then();
-        this.enabled = true;
-      }) : runResult;
+      return runResult.then(() => config.then?.()).finally(() => { this.enabled = true; });
     }
     for (let i = 0; i < maxIter; ++i) {
-      fun(i);
+      fun(maxIter - i);
     }
     if (config.then) config.then();
   },

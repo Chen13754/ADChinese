@@ -1,1 +1,1 @@
-{"version":25,"message":"请保存进度后刷新网页，以使用最新的 YC自用版。"}
+{"version":25,"ycRevision":"2026-10-11-fix8","message":"请保存进度后刷新网页，以使用最新的 YC自用版。"}

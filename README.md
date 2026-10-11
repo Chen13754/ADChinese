@@ -12,6 +12,8 @@
 
 文件导出包含当前槽的实时完整进度，文件名附导出时间。三个存档槽及自动备份沿用原版规则，切换设备需要手动传递文件。浏览器本地存档使用 `yc-ad:` 前缀，和原站分开；存档文件内容保持原生兼容。取消导入、损坏文件、不支持的版本和加载失败均保留当前进度。
 
+本地数据损坏时会进入“存档恢复”，暂停自动保存并保留原文。可先下载原始数据，再恢复有效槽或备份；重置当前槽需要明确勾选确认。浏览器存储满或禁止写入时，游戏保留内存进度并提示导出，不再因此停止主循环。
+
 ## YC控制台
 
 设置中的“YC控制台”每次刷新后首次进入都会显示体验警告。取消不视为确认。功能按当前进度开放：
@@ -54,6 +56,13 @@ npm run test:browser
 npm run test:timers
 npm run test:interaction
 npm run test:layout
+npm run test:regressions
+npm run test:compatibility
+npm run test:runtime
+npm run test:flows
+# 或一次执行所有本地验收（需保持 preview 运行）
+npm run test:all
+# 部署后线上验收
 npm run test:online
 ```
 

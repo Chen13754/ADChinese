@@ -216,6 +216,7 @@ export default {
         <li
           v-for="(hex, hexId) in hexGrid"
           :key="hexId + '-v-hex'"
+          :class="{ 'yc-v-placeholder': !hex.config && !hex.isRunButton, 'yc-v-start': hex.isRunButton }"
           :style="[hex.isRunButton ? {zIndex: 1} : {zIndex: 0}]"
         >
           <div

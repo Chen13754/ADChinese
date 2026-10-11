@@ -14,8 +14,8 @@ export default {
   data() {
     const save = GameStorage.saves[this.saveId];
     return {
-      antimatter: new Decimal(save ? save.antimatter || save.money : 10),
-      fileName: save ? save.options.saveFileName : ""
+      antimatter: GameStorage.checkPlayerObject(save) === "" ? new Decimal(save.antimatter ?? save.money) : new Decimal(10),
+      fileName: typeof save?.options?.saveFileName === "string" ? save.options.saveFileName : ""
     };
   },
   computed: {

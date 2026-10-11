@@ -22,8 +22,9 @@ export default {
     save() {
       return GameStorage.loadFromBackup(this.slotData.id);
     },
+    raw() { return GameStorage.backupRaw(this.slotData.id); },
     progressStr() {
-      if (!this.save) return "（空）";
+      if (!this.save) return this.raw ? "备份损坏，无法加载；可下载原始文件。" : "（空）";
 
       // These will be checked in order; the first nonzero resource will be returned
       const resources = [this.save.celestials.pelle.realityShards,
@@ -73,27 +74,9 @@ export default {
       this.currTime = Date.now();
     },
     load() {
-      if (!this.save) return;
-      // This seems to be the only way to properly hide the modal after the save is properly loaded,
-      // since the offline progress modal appears nearly immediately after clicking the button
-      Modal.hide();
-
-      // We still save to the reserve slot even if we're loading from it, so we temporarily store the
-      // save-to-be-loaded into a string in this scope so that it doesn't get overwritten by the current save
-      const toLoad = this.save;
-      GameStorage.saveToReserveSlot();
-
-      GameStorage.ignoreBackupTimer = true;
-      GameStorage.offlineEnabled = player.options.loadBackupWithoutOffline ? false : undefined;
-      GameStorage.oldBackupTimer = player.backupTimer;
-      GameStorage.loadPlayerObject(toLoad);
-      GameUI.notify.info(`游戏已加载备份槽位 #${this.slotData.id}`);
-      GameStorage.loadBackupTimes();
-      GameStorage.ignoreBackupTimer = false;
-      GameStorage.offlineEnabled = undefined;
-      GameStorage.resetBackupTimer();
-      GameStorage.save(true);
+      return GameStorage.restoreBackup(this.slotData.id);
     },
+    downloadRaw() { GameStorage.exportBackupRaw(this.slotData.id); },
   },
   template: `
   <div
@@ -116,6 +99,7 @@ export default {
     >
       加载
     </PrimaryButton>
+    <PrimaryButton v-if="raw && !save" @click="downloadRaw">下载原始备份</PrimaryButton>
   </div>
   `
 };

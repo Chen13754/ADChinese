@@ -271,3 +271,19 @@ button:focus-visible, [tabindex]:focus-visible, input:focus-visible, textarea:fo
 @media (max-width: 1024px) {
   #ui-container .c-antimatter-prestige-row .o-primary-btn { font-size: 1.3rem; line-height: 1.4; min-height: 5.6rem; height: auto; padding: .7rem; white-space: normal; }
 }
+
+/* Keep each native hexagon intact; remove honeycomb staggering on narrow screens. */
+@media (max-width: 1024px) {
+  .l-v-unlocks-container { width: 100%; flex-direction: column; align-items: center; overflow: visible; gap: 1rem; }
+  .l-v-unlocks-container li:nth-child(n) {
+    flex: none; width: 27rem; height: 31.2rem; padding: 0; margin: 0; transform: none;
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  }
+  .l-v-unlocks-container .l-v-hexagon { transform: none; }
+  .l-v-unlocks-container .yc-v-placeholder { display: none; }
+  .l-v-unlocks-container .yc-v-start { order: -1; }
+  .l-v-milestones-grid__row { flex-wrap: wrap; gap: 1rem; }
+  .l-v-milestones-grid__row .o-v-milestone { height: auto; min-height: 10rem; max-width: 100%; }
+  .l-v-celestial-tab .c-v-unlock-bar { max-width: 100%; }
+  .l-v-celestial-tab .l-v-reduction { min-width: 44px; min-height: 44px; }
+}

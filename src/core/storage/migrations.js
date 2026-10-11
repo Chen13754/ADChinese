@@ -94,12 +94,7 @@ export const migrations = {
         player.lastTenRuns[i][2] = player.lastTenRuns[i][0];
       }
       player.options.newUI = false;
-      window.uiChoiceModalInterval = setInterval(() => {
-        if (GameUI.initialized) {
-          Modal.uiChoice.show();
-          clearInterval(window.uiChoiceModalInterval);
-        }
-      }, 1000);
+      // UI choice is shown by the loader only after this candidate commits.
 
       migrations.normalizeTimespans(player);
       migrations.convertAutobuyerMode(player);

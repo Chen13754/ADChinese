@@ -17,6 +17,7 @@ export default {
   data() {
     return {
       input: this.initialInput,
+      isLoading: false,
       offlineImport: OFFLINE_PROGRESS_TYPE.IMPORTED,
     };
   },
@@ -133,10 +134,15 @@ export default {
           break;
       }
     },
-    importSave() {
-      if (!this.inputIsValid) return;
-      this.emitClose();
-      GameStorage.import(this.input);
+    async importSave() {
+      if (!this.inputIsValid || this.isLoading) return;
+      const secret = this.inputIsSecret;
+      this.isLoading = true;
+      try {
+        await GameStorage.import(this.input);
+        // Successful loads close their own dialog; a failed load leaves the input available.
+        if (secret && Modal.import.isOpen) this.emitClose();
+      } finally { this.isLoading = false; }
     },
   },
   template: `

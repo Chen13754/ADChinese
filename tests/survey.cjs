@@ -1,6 +1,6 @@
 process.env.PLAYWRIGHT_BROWSERS_PATH=require('path').resolve('.cache/browsers');process.env.TEMP=process.env.TMP=require('path').resolve('.cache/browser-temp');
 const fs=require('fs'),assert=require('node:assert/strict');const {chromium}=require('playwright-core');const fixture=require('./fixture.cjs');
-(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});const errors=[];p.on('pageerror',e=>errors.push(e.stack));await p.goto('http://127.0.0.1:4173');await p.waitForFunction(()=>window.ui?.view?.initialized);await p.waitForTimeout(2500);await p.evaluate(()=>{GameIntervals.stop();GameIntervals.gameLoop.start=()=>{};});const results=[];
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});const errors=[];p.on('pageerror',e=>errors.push(e.stack));p.on('console',m=>{if(m.type()==='error')errors.push(m.text());});await p.goto('http://127.0.0.1:4173');await p.waitForFunction(()=>window.ui?.view?.initialized);await p.waitForTimeout(2500);await p.evaluate(()=>{GameIntervals.stop();GameIntervals.gameLoop.start=()=>{};});const results=[];
 const widths=process.env.YC_WIDTH ? [Number(process.env.YC_WIDTH)] : [360,390,430,768,1440];
 for(const width of widths)for(const modern of [true,false]){
  await p.setViewportSize({width,height:width===768?1024:900});

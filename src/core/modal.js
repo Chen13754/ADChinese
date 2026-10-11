@@ -1,3 +1,4 @@
+import StorageRecoveryModal from "../components/modals/StorageRecoveryModal.js";
 import YCConsoleModal from "../components/modals/YCConsoleModal.js";
 import YCExportModal from "../components/modals/YCExportModal.js";
 import { ProgressChecker } from "./storage/progress-checker.js";
@@ -345,3 +346,5 @@ Modal.message = new class extends Modal {
 
 Modal.ycConsole = new Modal(YCConsoleModal);
 Modal.ycExport = new Modal(YCExportModal);
+
+Modal.storageRecovery = new Modal(StorageRecoveryModal, 100);

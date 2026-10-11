@@ -12,7 +12,12 @@
     "build": "node tests/package.cjs",
     "test:timers": "node tests/timers.cjs",
     "test:interaction": "node tests/interactions.cjs",
-    "test:online": "node tests/online.cjs"
+    "test:online": "node tests/online.cjs",
+    "test:regressions": "node tests/regressions.cjs",
+    "test:compatibility": "node tests/compatibility.cjs",
+    "test:runtime": "node tests/runtime.cjs",
+    "test:flows": "node tests/flows.cjs",
+    "test:all": "node tests/all.cjs"
   },
   "devDependencies": {
     "acorn": "^8.19.0",
